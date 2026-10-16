@@ -105,7 +105,7 @@
   - [x] Build a simple GUI to select an input image
   - [ ] Let the user choose an enhancement method and settings
   - [ ] Let the user choose where to save the output
-  - [ ] Show useful progress, success, and error messages
+  - [x] Show useful progress, success, and error messages
   - [ ] Keep the interface responsive during processing where practical
   - [ ] Organize the project files and dependencies
   - [ ] Add installation and usage instructions to `README.md`
@@ -126,18 +126,4 @@
 - [ ] Git history shows meaningful development
 - [ ] Screenshots or a short demo are included in the repository
 
-## Notes / learning log
 
-### Current stage
-- **Stage:** 
-- **Started:** 
-- **Target completion:** 
-
-### What I learned
-- 
-
-### Problems to solve
-- 
-
-### Next small task
-- 

@@ -4,43 +4,54 @@
 
 ### What we did
 
-- Reviewed the image input flow across `gui.py`, `main.py`, and `loader.py`.
-- Confirmed that the GUI receives a dropped file path temporarily and passes it to `validate_input()` in `main.py`.
-- Confirmed that `load_image()` uses `cv2.imread()` and raises a `ValueError` when OpenCV cannot load the file.
-- Confirmed that the GUI displays an error for an invalid drop and keeps the valid dropped path for later processing.
-- Updated the Stage 2 checklist in `ROADMAP.md` for successful-load checking and handling invalid or unsupported image files.
-- Ran `gui.py` and confirmed that the GUI window appears.
-- Confirmed drag-and-drop image selection and the operation dropdown work.
-- Marked “Build a simple GUI to select an input image” complete in `ROADMAP.md`.
-- Adjusted `user_option()` in `main.py` so it can route either a terminal choice or the GUI's operation choice.
-- Changed `main()` to receive the image path and operation, then reuse the existing processing and saving functions.
-- Connected the GUI's Process button to `main.py` and moved the saved-image confirmation into the GUI.
+| # | Task | Status |
+|---:|---|---|
+| 1 | Reviewed the image input flow across `gui.py`, `main.py`, and `loader.py`. | Done |
+| 2 | Confirmed that the GUI temporarily receives a dropped file path and passes it to `validate_input()` in `main.py`. | Done |
+| 3 | Confirmed that `load_image()` uses `cv2.imread()` and raises a `ValueError` when OpenCV cannot load the file. | Done |
+| 4 | Confirmed that the GUI displays an error for an invalid drop and keeps a valid dropped path for later processing. | Done |
+| 5 | Updated the Stage 2 checklist in `ROADMAP.md` for successful-load checking and invalid or unsupported image files. | Done |
+| 6 | Ran `gui.py` and confirmed that the GUI window appears. | Done |
+| 7 | Confirmed drag-and-drop image selection and the operation dropdown work. | Done |
+| 8 | Marked “Build a simple GUI to select an input image” complete in `ROADMAP.md`. | Done |
+| 9 | Adjusted `user_option()` in `main.py` to route either a terminal choice or the GUI's operation choice. | Done |
+| 10 | Changed `main()` to receive the image path and operation, then reuse existing processing and saving functions. | Done |
+| 11 | Connected the GUI's Process button to `main.py` and moved the saved-image confirmation into the GUI. | Done |
 
-### Plan for tomorrow
+### Plan for the next session
 
 - Run the full GUI resize-and-save flow after the latest success-message change.
-- Continue the GUI workflow, then decide how to handle the unfinished Enhance option and fixed output location.
+- Continue the GUI workflow.
+- Decide how to handle the unfinished Enhance option and fixed output location.
+
+---
 
 ## 2026-10-16
 
 ### What we did
 
-- Reviewed `WORKFLOW.md` against the current GUI and backend design.
-- Removed the terminal menu from `main.py` and made it provide UI-independent validation and processing functions.
-- Connected `gui.py` to `main.py` for image validation, processing, and saving; the GUI displays errors and the returned output path.
-- Changed processing functions to receive an already loaded image, leaving image loading and operation routing to `main.py`.
-- Updated `save.py` to return the output path, report failed writes, and protect the source image if it matches the default output path.
-- Updated `WORKFLOW.md` to describe the implemented responsibilities and current behavior.
-- Left roadmap checkboxes unchanged because the new workflow still needs to be demonstrated in the GUI before marking an item complete.
+| # | Task | Status |
+|---:|---|---|
+| 1 | Reviewed `WORKFLOW.md` against the current GUI and backend design. | Done |
+| 2 | Removed the terminal menu from `main.py` and made it provide UI-independent validation and processing functions. | Done |
+| 3 | Connected `gui.py` to `main.py` for image validation, processing, and saving; the GUI displays errors and the returned output path. | Done |
+| 4 | Changed processing functions to receive an already loaded image, leaving image loading and operation routing to `main.py`. | Done |
+| 5 | Updated `save.py` to return the output path, report failed writes, and protect the source image if it matches the default output path. | Done |
+| 6 | Updated `WORKFLOW.md` to describe the implemented responsibilities and current behavior. | Done |
+| 7 | Ran the GUI resize-and-save workflow and confirmed the processed image was saved. | Done |
+| 8 | Explained what `validate_input()` checks and why `gui.py` calls it when an image is dropped. | Done |
+| 9 | Traced how `process_image()` selects an operation, loads and processes the image, and sends the result to `save.py`. | Done |
+| 10 | Explained what `gui.py` displays when the workflow succeeds or raises an error. | Done |
+| 11 | Ran the GUI flow and confirmed the behavior before changing code or checking off another roadmap item. | Done |
 
-### Plan for next work session
+### Plan for the next session
 
-- Keep tomorrow's session light and focus on understanding the code that is already in the project.
+First display an image and understand the difference between BGR and RGB. Then compare OpenCV's nearest, linear, cubic, and Lanczos interpolation methods.
 
 ### Tomorrow's learning checklist
 
-- [ ] Explain what `validate_input()` checks and why `gui.py` calls it when an image is dropped.
-- [ ] Trace how `process_image()` loads the image, chooses an operation, and sends the result to `save.py`.
-- [ ] Explain what `gui.py` displays when the workflow succeeds or raises an error.
-- [ ] Run the GUI flow and confirm the behavior together before changing any more code or checking off a roadmap item.
+| # | Learning task | Status |
+|---:|---|---|
+| 1 | Display an image and explain the difference between OpenCV's BGR channel order and RGB. | [ ] |
+| 2 | Compare nearest, linear, cubic, and Lanczos interpolation methods. | [ ] |
 
