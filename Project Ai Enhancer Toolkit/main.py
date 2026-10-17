@@ -5,11 +5,17 @@ from enhance import enhance_image
 from loader import load_image
 from resize import resize_image
 from save import save_image
+from crop import crop_image
+from blur import blur_image
+from sharpen import sharpen_image
 
 
 OPERATIONS = {
     "Resize the image": resize_image,
     "Enhance the image": enhance_image,
+    "Crop the image": crop_image,
+    "Blur the image": blur_image,
+    "Sharpen the image": sharpen_image
 }
 
 def _validate_path(path):

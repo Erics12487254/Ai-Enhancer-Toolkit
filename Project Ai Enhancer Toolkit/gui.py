@@ -48,7 +48,10 @@ class ToolkitGUI:
             self.main_frame,
             self.operation,
             "Resize the image",
-            "Enhance the image"
+            "Enhance the image",
+            "Crop the image",
+            "Blur the image",
+            "Sharpen the image"
         )
         self.operation_menu.grid(row=1, column=0, padx=10, pady=10)
 
