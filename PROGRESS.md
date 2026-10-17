@@ -52,6 +52,38 @@ First display an image and understand the difference between BGR and RGB. Then c
 
 | # | Learning task | Status |
 |---:|---|---|
-| 1 | Display an image and explain the difference between OpenCV's BGR channel order and RGB. | [ ] |
-| 2 | Compare nearest, linear, cubic, and Lanczos interpolation methods. | [ ] |
+| 1 | Display an image and explain the difference between OpenCV's BGR channel order and RGB. | [x] |
+| 2 | Compare nearest, linear, cubic, and Lanczos interpolation methods. | [x] |
+
+---
+
+## 2026-10-17
+
+### What we did
+
+| # | Task | Status |
+|---:|---|---|
+| 1 | Displayed an image and reviewed OpenCV's BGR channel order, image shape, and pixel values. | Done |
+| 2 | Compared nearest, linear, cubic, and Lanczos interpolation methods. | Done |
+
+### Extra
+
+| # | Task | Status |
+|---:|---|---|
+| 1 | Compared an original image with one downscaled and enlarged again; observed the limits of traditional upscaling. | Done |
+| 2 | Added the crop operation to the GUI workflow and confirmed the saved crop shape was 400 × 400 × 3. | Done |
+| 3 | Applied Gaussian blur and sharpening filters; reviewed the sharpening kernel and confirmed the output dimensions and pixel values changed. | Done |
+| 4 | Deferred brightness, contrast, and color adjustments to Future development. | Deferred |
+
+### Plan for the next session
+
+- Begin Stage 4 — Machine Learning Fundamentals.
+
+### Tomorrow's learning checklist
+
+| # | Learning task | Status |
+|---:|---|---|
+| 1 | Understand features, labels, datasets, and predictions using an image example. | [ ] |
+| 2 | Understand training, validation, and test sets using the same example. | [ ] |
+| 3 | Learn loss functions and optimization at a high level using a simple prediction example. | [ ] |
 

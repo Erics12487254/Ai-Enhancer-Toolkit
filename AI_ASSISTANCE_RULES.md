@@ -28,6 +28,15 @@
 - If you identify a potentially better approach, feel free to suggest it and explain why it may be more suitable. Let me decide whether to adopt it.
 - If my instructions are unclear or ambiguous, ask me for clarification before proceeding.
 
+### 2.3 Technical Safety and Isolation
+
+- Follow the configured sandbox and permission settings. Do not attempt to bypass, disable, or weaken them.
+- Treat Markdown rules as behavioral instructions, not as a substitute for technical access restrictions.
+- Prefer read-only access while explaining code or planning changes.
+- Before performing approved implementation work, explain which files need to change and why.
+- Do not access unrelated personal files, credentials, secrets, or system resources.
+- If a task requires broader permissions than currently available, explain why and wait for explicit authorization. Never attempt to obtain broader access independently.
+
 ## 3. Daily Work Process
 
 ### 3.1 Before Starting Daily Work
@@ -54,6 +63,7 @@
 - Complete at least one checklist item each day.
 - Do not skip tasks or complete them in a random order unless an admin approves a different approach.
 - Carry unfinished checklist items forward to the next day's tasks.
+-- Update `Roadmap.md` at the end of each day's work.
 
 ### 4.2 `PROGRESS.md` — Daily Progress Records
 - Update `PROGRESS.md` at the end of each day's work to accurately reflect completed tasks, progress made, and remaining work.

@@ -17,24 +17,23 @@
   - [x] Handle common errors with exceptions
   - [x] Write basic tests for important methods
 
-- [ ] **Stage 2 — OpenCV** *(2–3 weeks)*
+- [x] **Stage 2 — OpenCV** *(2–3 weeks)*
   - [x] Load an image with `cv2.imread()`
   - [x] Check whether an image loaded successfully
   - [x] Understand image shape: height, width, and channels
-  - [ ] Display images and understand BGR vs. RGB
+  - [x] Display images and understand BGR vs. RGB
   - [x] Save images with `cv2.imwrite()`
   - [x] Handle invalid paths and unsupported files
   - [x] Build a simple load → process → save workflow
 
-- [ ] **Stage 3 — Image Processing** *(3–5 weeks)*
+- [x] **Stage 3 — Image Processing** *(3–5 weeks)*
   - [x] Resize images to custom dimensions
-  - [ ] Compare interpolation methods (nearest, linear, cubic, Lanczos)
+  - [x] Compare interpolation methods (nearest, linear, cubic, Lanczos)
   - [x] Preserve aspect ratio when resizing
-  - [ ] Crop an image using array slicing
-  - [ ] Apply blur and sharpening filters
-  - [ ] Experiment with brightness, contrast, and color adjustments
-  - [ ] Understand the limits of traditional upscaling
-  - [ ] Compare original and processed outputs
+  - [x] Crop an image using array slicing
+  - [x] Apply blur and sharpening filters
+  - [x] Understand the limits of traditional upscaling
+  - [x] Compare original and processed outputs
 
 - [ ] **Stage 4 — Machine Learning Fundamentals** *(3–5 weeks)*
   - [ ] Understand features, labels, datasets, and predictions
@@ -125,5 +124,13 @@
 - [ ] Known limitations are explained honestly
 - [ ] Git history shows meaningful development
 - [ ] Screenshots or a short demo are included in the repository
+
+# Future development
+- [ ] Continue developing gui or replace with another front end. 
+- [ ] Update crop.py into realistic version.
+- [ ] Update resize.py into realistic version.
+- [ ] Update filter.py into system deciding a suitable one on it's own.
+- [ ] Update sharpen.py into realistic version.
+- [ ] Experiment with brightness, contrast, and color adjustments
 
 
