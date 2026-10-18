@@ -35,13 +35,13 @@
   - [x] Understand the limits of traditional upscaling
   - [x] Compare original and processed outputs
 
-- [ ] **Stage 4 — Machine Learning Fundamentals** *(3–5 weeks)*
-  - [ ] Understand features, labels, datasets, and predictions
-  - [ ] Understand training, validation, and test sets
-  - [ ] Learn loss functions and optimization at a high level
-  - [ ] Understand overfitting and generalization
-  - [ ] Learn why data quality and preprocessing matter
-  - [ ] Complete a small beginner ML exercise
+- [x] **Stage 4 — Machine Learning Fundamentals** *(3–5 weeks)*
+  - [x] Understand features, labels, datasets, and predictions
+  - [x] Understand training, validation, and test sets
+  - [x] Learn loss functions and optimization at a high level
+  - [x] Understand overfitting and generalization
+  - [x] Learn why data quality and preprocessing matter
+  - [x] Complete a small beginner ML exercise
 
 - [ ] **Stage 5 — Deep Learning** *(4–6 weeks)*
   - [ ] Understand tensors and layers

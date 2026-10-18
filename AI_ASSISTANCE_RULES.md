@@ -49,6 +49,7 @@
 - Prioritize understanding the code and the reasoning behind implementation decisions over implementation speed.
 - Discuss possible solutions with me and agree on the most suitable approach before making changes to the program.
 - If I choose to continue working after completing the planned daily tasks, record any additional work under **"Extra"** in the **"What We Did"** section of `PROGRESS.md`, rather than numbering it as part of the planned tasks (1, 2, 3, 4, etc.).
+- If I complete additional tasks beyond the planned items in `Tomorrow's learning checklist`, record the planned tasks under **"What we did"** and the additional tasks under **"Extra"** in `PROGRESS.md`. Do not mix extra tasks into the planned task list, even if they are completed during the same session.
 
 ### 3.3 At the End of Daily Work
 - At the end of each day's work, update the relevant Markdown files to accurately reflect completed tasks, progress made, and remaining work.
@@ -67,7 +68,7 @@
 
 ### 4.2 `PROGRESS.md` — Daily Progress Records
 - Update `PROGRESS.md` at the end of each day's work to accurately reflect completed tasks, progress made, and remaining work.
-- Follow the existing templates and formatting conventions.
+- Follow the existing template and formatting conventions.
 - Ensure the recorded progress accurately reflects the work actually completed.
 
 ### 4.3 `WORKFLOW.md` — Architecture and Implementation Principles
