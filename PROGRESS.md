@@ -182,6 +182,39 @@ None.
 
 | # | Learning task | Status |
 |---:|---|---|
-| 1 | Understand tensors and layers. | [ ] |
-| 2 | Understand weights, biases, and activations. | [ ] |
-| 3 | Understand a forward pass conceptually. | [ ] |
+| 1 | Understand tensors and layers. | [x] |
+| 2 | Understand weights, biases, and activations. | [x] |
+| 3 | Understand a forward pass conceptually. | [x] |
+
+---
+
+# 2026-10-20
+
+### What we did
+
+| # | Task | Status |
+|---:|---|---|
+| 1 | Learned how tensors and layers represent and process image data. | Done |
+| 2 | Understood how weights, biases, and activation functions affect layer calculations. | Done |
+| 3 | Traced a forward pass from input values through layers to an output. | Done |
+
+### Extra
+
+| # | Task | Status |
+|---:|---|---|
+| 1 | Learned how backpropagation uses prediction error to update weights and biases. | Done |
+| 2 | Learned how epochs, batches, and learning rate shape the training process. | Done |
+| 3 | Learned how CNN filters produce feature maps and how layers can combine image features. | Done |
+| 4 | Ran a small neural-network example in the project virtual environment; one training update reduced the loss from 0.2113 to 0.1460. | Done |
+
+### Plan for the next session
+
+- Begin Stage 6 — PyTorch.
+
+### Tomorrow's learning checklist
+
+| # | Learning task | Status |
+|---:|---|---|
+| 1 | Create and manipulate PyTorch tensors. | [ ] |
+| 2 | Understand CPU vs. GPU device selection. | [ ] |
+| 3 | Build a `Dataset` and `DataLoader`. | [ ] |

@@ -43,14 +43,14 @@
   - [x] Learn why data quality and preprocessing matter
   - [x] Complete a small beginner ML exercise
 
-- [ ] **Stage 5 — Deep Learning** *(4–6 weeks)*
-  - [ ] Understand tensors and layers
-  - [ ] Understand weights, biases, and activations
-  - [ ] Understand forward pass and backpropagation conceptually
-  - [ ] Understand epochs, batches, and learning rate
-  - [ ] Learn the basics of convolutional neural networks (CNNs)
-  - [ ] Understand how a CNN can learn image features
-  - [ ] Run a small neural-network example
+- [x] **Stage 5 — Deep Learning** *(4–6 weeks)*
+  - [x] Understand tensors and layers
+  - [x] Understand weights, biases, and activations
+  - [x] Understand forward pass and backpropagation conceptually
+  - [x] Understand epochs, batches, and learning rate
+  - [x] Learn the basics of convolutional neural networks (CNNs)
+  - [x] Understand how a CNN can learn image features
+  - [x] Run a small neural-network example
 
 - [ ] **Stage 6 — PyTorch** *(2–4 weeks)*
   - [ ] Create and manipulate tensors
