@@ -52,20 +52,20 @@
   - [x] Understand how a CNN can learn image features
   - [x] Run a small neural-network example
 
-- [ ] **Stage 6 — PyTorch** *(2–4 weeks)*
-  - [ ] Create and manipulate tensors
-  - [ ] Understand CPU vs. GPU device selection
-  - [ ] Build a `Dataset` and `DataLoader`
-  - [ ] Define a model with `torch.nn`
-  - [ ] Write a training loop
-  - [ ] Calculate loss and update model parameters
-  - [ ] Save and load model weights
-  - [ ] Track training and validation loss
+- [x] **Stage 6 — PyTorch** *(2–4 weeks)*
+  - [x] Create and manipulate tensors
+  - [x] Understand CPU vs. GPU device selection
+  - [x] Build a `Dataset` and `DataLoader`
+  - [x] Define a model with `torch.nn`
+  - [x] Write a training loop
+  - [x] Calculate loss and update model parameters
+  - [x] Save and load model weights
+  - [x] Track training and validation loss
 
 - [ ] **Stage 7 — Super-Resolution** *(4–7 weeks)*
-  - [ ] Research beginner-friendly super-resolution models (e.g. SRCNN or ESPCN)
-  - [ ] Choose a realistic dataset and check its usage licence
-  - [ ] Prepare low-resolution inputs and high-resolution targets
+  - [x] Research beginner-friendly super-resolution models (e.g. SRCNN or ESPCN)
+  - [x] Choose a realistic dataset and check its usage licence
+  - [x] Prepare low-resolution inputs and high-resolution targets
   - [ ] Build or adapt a baseline model
   - [ ] Train a small model or run a pretrained model as a baseline
   - [ ] Test on images not used during training

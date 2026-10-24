@@ -215,6 +215,92 @@ None.
 
 | # | Learning task | Status |
 |---:|---|---|
-| 1 | Create and manipulate PyTorch tensors. | [ ] |
-| 2 | Understand CPU vs. GPU device selection. | [ ] |
-| 3 | Build a `Dataset` and `DataLoader`. | [ ] |
+| 1 | Create and manipulate PyTorch tensors. | [x] |
+| 2 | Understand CPU vs. GPU device selection. | [x] |
+| 3 | Build a `Dataset` and `DataLoader`. | [x] |
+
+---
+
+# 2026-10-21
+
+### What we did
+
+| # | Task | Status |
+|---:|---|---|
+| 1 | Learned how tensor normalization changes pixel values without changing tensor shape. | Done |
+| 2 | Learned how PyTorch selects a CPU or CUDA device and how `.to(device)` moves a tensor while preserving its values and shape. | Done |
+| 3 | Learned how a `Dataset` pairs each image with its label and how a `DataLoader` groups those pairs into batches. | Done |
+
+### Extra
+
+| # | Task | Status |
+|---:|---|---|
+| 1 | Organized the learning scripts under `test/` by roadmap stage. | Done |
+| 2 | Documented the stage-based learning examples in `README.md`. | Done |
+
+### Plan for the next session
+
+- Define a simple model with `torch.nn` and trace how it turns an input tensor into an output.
+
+### Tomorrow's learning checklist
+
+| # | Learning task | Status |
+|---:|---|---|
+| 1 | Define a model with `torch.nn`. | [x] |
+| 2 | Understand the steps in a basic PyTorch training loop. | [x] |
+| 3 | Calculate loss and update model parameters. | [x] |
+
+---
+
+# 2026-10-23
+
+### What we did
+
+| # | Task | Status |
+|---:|---|---|
+| 1 | Define a model with `torch.nn`. | Done |
+| 2 | Write a training loop. | Done |
+| 3 | Calculate loss and update model parameters. | Done |
+
+### Extra
+
+| # | Task | Status |
+|---:|---|---|
+| 1 | Save and load model weights. | Done |
+| 2 | Track training and validation loss. | Done |
+
+### Plan for the next session
+
+- Research beginner-friendly super-resolution models, then choose a realistic dataset and check its usage licence.
+
+### Tomorrow's learning checklist
+
+| # | Learning task | Status |
+|---:|---|---|
+| 1 | Research beginner-friendly super-resolution models such as SRCNN or ESPCN. | [x] |
+| 2 | Choose a realistic super-resolution dataset and check its usage licence. | [x] |
+
+# 2026-10-24
+
+### What we did
+
+| # | Task | Status |
+|---:|---|---|
+| 1 | Researched beginner-friendly super-resolution models, including SRCNN and ESPCN. | Done |
+| 2 | Selected five Wikimedia Commons images and reviewed their usage licence information. | Done |
+
+### Extra
+
+| # | Task | Status |
+|---:|---|---|
+| 1 | Created low-resolution copies for five high-resolution images and paired them with their originals. | Done |
+
+### Plan for the next session
+
+- Understand the baseline model before continuing with training.
+
+### Tomorrow's learning checklist
+
+| # | Learning task | Status |
+|---:|---|---|
+| 1 | Trace one low-resolution tensor through the baseline model and explain the shape changes at each stage. | [ ] |

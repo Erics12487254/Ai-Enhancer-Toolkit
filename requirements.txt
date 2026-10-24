@@ -1,2 +1,3 @@
 opencv-python
 tkinterdnd2
+torch

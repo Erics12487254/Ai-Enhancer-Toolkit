@@ -44,12 +44,13 @@
 - Follow the checklist in `ROADMAP.md` from top to bottom. Do not skip tasks or complete them in a random order unless an admin approves a different approach.
 
 ### 3.2 During Daily Work
-- Complete at least one checklist item in `ROADMAP.md` each day.
+
+- Aim to complete at least one checklist item in `ROADMAP.md` each day. If the current item cannot be completed, record the actual progress and carry it forward without rushing or skipping tasks.
 - If a checklist item cannot be completed, carry it forward to the next day's tasks.
 - Prioritize understanding the code and the reasoning behind implementation decisions over implementation speed.
 - Discuss possible solutions with me and agree on the most suitable approach before making changes to the program.
-- If I choose to continue working after completing the planned daily tasks, record any additional work under **"Extra"** in the **"What We Did"** section of `PROGRESS.md`, rather than numbering it as part of the planned tasks (1, 2, 3, 4, etc.).
-- If I complete additional tasks beyond the planned items in `Tomorrow's learning checklist`, record the planned tasks under **"What we did"** and the additional tasks under **"Extra"** in `PROGRESS.md`. Do not mix extra tasks into the planned task list, even if they are completed during the same session.
+- If I choose to continue working after completing the planned daily tasks, record any additional work under **"Extra"** in the **"What We Did"** section of `PROGRESS.md`, rather than numbering it as part of the planned tasks.
+- If I complete additional tasks beyond the planned items in `Tomorrow's learning checklist`, record the planned tasks under **"What We Did"** and additional tasks under **"Extra"** in `PROGRESS.md`. Do not mix extra tasks into the planned task list.
 
 ### 3.3 At the End of Daily Work
 - At the end of each day's work, update the relevant Markdown files to accurately reflect completed tasks, progress made, and remaining work.
@@ -82,6 +83,17 @@
 - Review other relevant Markdown files when starting daily work.
 - Follow their existing templates, formatting conventions, and documented purposes.
 - At the end of daily work, update relevant Markdown files when necessary, subject to the permission and change-control rules in Section 2.
+
+### 4.5 Strict Roadmap Compliance
+
+- Always follow `ROADMAP.md` from top to bottom. The first incomplete checklist item determines the next task.
+- Before starting any new project task, verify that it follows the roadmap order. If my request conflicts with that order, explain the conflict and ask whether I approve the exception.
+- Never skip, reorder, or add roadmap tasks without my explicit approval.
+- Update `PROGRESS.md` based only on work actually completed. Keep planned tasks and extra work separate.
+- Record partial progress honestly, but mark a roadmap item complete only when all its requirements are satisfied and completion is supported by sufficient evidence.
+- Carry unfinished tasks forward without skipping their position in the roadmap.
+- If the roadmap and progress log conflict, stop and ask me instead of guessing.
+- Follow Section 2's permission rules before modifying any file.
 
 ## 5. Code Explanation and Comment Standards
 
