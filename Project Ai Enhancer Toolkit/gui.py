@@ -3,7 +3,7 @@ import tkinter as tk
 
 from tkinterdnd2 import DND_FILES, TkinterDnD
 
-from main import process_image, validate_input
+from main import OPERATIONS, process_image, validate_input
 
 
 class ToolkitGUI:
@@ -47,11 +47,7 @@ class ToolkitGUI:
         self.operation_menu = tk.OptionMenu(
             self.main_frame,
             self.operation,
-            "Resize the image",
-            "Enhance the image",
-            "Crop the image",
-            "Blur the image",
-            "Sharpen the image"
+            *OPERATIONS.keys()
         )
         self.operation_menu.grid(row=1, column=0, padx=10, pady=10)
 

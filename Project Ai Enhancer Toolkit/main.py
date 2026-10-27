@@ -29,7 +29,7 @@ def validate_input(path):
     load_image(path)
     return path
 
-
+# Validate the path even if the caller skipped validate_input().
 def process_image(path, operation, output_path=None): 
     """Run one supported operation and save the result; return its location."""
     _validate_path(path)
