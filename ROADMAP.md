@@ -66,20 +66,20 @@
   - [x] Research beginner-friendly super-resolution models (e.g. SRCNN or ESPCN)
   - [x] Choose a realistic dataset and check its usage licence
   - [x] Prepare low-resolution inputs and high-resolution targets
-  - [ ] Build or adapt a baseline model
-  - [ ] Train a small model or run a pretrained model as a baseline
-  - [ ] Test on images not used during training
-  - [ ] Compare the model against traditional interpolation
-  - [ ] Record limitations, artifacts, and failure cases
+  - [x] Build or adapt a baseline model
+  - [postpone] Train a small model or run a pretrained model as a baseline
+  - [postpone] Test on images not used during training
+  - [postpone] Compare the model against traditional interpolation
+  - [postpone] Record limitations, artifacts, and failure cases
 
-- [ ] **Stage 8 — Advanced OOP / Refactoring** *(2–3 weeks)*
-  - [ ] Review what has become difficult to maintain
-  - [ ] Separate image I/O, processing, model inference, and UI responsibilities
-  - [ ] Define clear class and method responsibilities
-  - [ ] Avoid unnecessary inheritance and overly complicated abstractions
-  - [ ] Add input validation and useful error messages
-  - [ ] Add or improve unit tests
-  - [ ] Refactor without changing expected behavior
+- [x] **Stage 8 — Advanced OOP / Refactoring** *(2–3 weeks)*
+  - [x] Review what has become difficult to maintain
+  - [x] Separate image I/O, processing, model inference, and UI responsibilities
+  - [x] Define clear class and method responsibilities
+  - [x] Avoid unnecessary inheritance and overly complicated abstractions
+  - [x] Add input validation and useful error messages
+  - [x] Add or improve unit tests
+  - [x] Refactor without changing expected behavior
 
 - [ ] **Stage 9 — Generative AI Enhancement** *(3–6 weeks)*
   - [ ] Learn the difference between restoration, super-resolution, and generative enhancement

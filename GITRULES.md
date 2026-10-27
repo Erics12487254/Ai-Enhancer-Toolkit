@@ -7,3 +7,4 @@
 - test	    Add or modify tests
 - refactor  Improve code structure without changing behavior
 - rec       Resources
+- test      Testing

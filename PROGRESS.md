@@ -8,14 +8,14 @@
 
 | # | Task | Status |
 |---:|---|---|
-| 1 | [Main task completed during the session.] | Done |
-| 2 | [Second task completed during the session.] | Done |
+| 1 | [Main task completed during the session.] | [x] |
+| 2 | [Second task completed during the session.] | [x] |
 
 ### Extra
 
 | # | Task | Status |
 |---:|---|---|
-| 1 | [Additional experiment, practice, or discovery.] | Done |
+| 1 | [Additional experiment, practice, or discovery.] | [x] |
 
 If no extra work was done, write `None`.
 
@@ -35,9 +35,7 @@ If no extra work was done, write `None`.
 
 - `[ ]` = Not completed
 - `[x]` = Completed
-- `In Progress` = Started but unfinished
-- `Done` = Task finished
-- `Deferred` = Postponed for future development
+- `Postpone` = Postponed for future development
 - `None` = No extra work was done
 
 ### Progress logging rules
@@ -56,17 +54,17 @@ If no extra work was done, write `None`.
 
 | # | Task | Status |
 |---:|---|---|
-| 1 | Reviewed the image input flow across `gui.py`, `main.py`, and `loader.py`. | Done |
-| 2 | Confirmed that the GUI temporarily receives a dropped file path and passes it to `validate_input()` in `main.py`. | Done |
-| 3 | Confirmed that `load_image()` uses `cv2.imread()` and raises a `ValueError` when OpenCV cannot load the file. | Done |
-| 4 | Confirmed that the GUI displays an error for an invalid drop and keeps a valid dropped path for later processing. | Done |
-| 5 | Updated the Stage 2 checklist in `ROADMAP.md` for successful-load checking and invalid or unsupported image files. | Done |
-| 6 | Ran `gui.py` and confirmed that the GUI window appears. | Done |
-| 7 | Confirmed drag-and-drop image selection and the operation dropdown work. | Done |
-| 8 | Marked “Build a simple GUI to select an input image” complete in `ROADMAP.md`. | Done |
-| 9 | Adjusted `user_option()` in `main.py` to route either a terminal choice or the GUI's operation choice. | Done |
-| 10 | Changed `main()` to receive the image path and operation, then reuse existing processing and saving functions. | Done |
-| 11 | Connected the GUI's Process button to `main.py` and moved the saved-image confirmation into the GUI. | Done |
+| 1 | Reviewed the image input flow across `gui.py`, `main.py`, and `loader.py`. | [x] |
+| 2 | Confirmed that the GUI temporarily receives a dropped file path and passes it to `validate_input()` in `main.py`. | [x] |
+| 3 | Confirmed that `load_image()` uses `cv2.imread()` and raises a `ValueError` when OpenCV cannot load the file. | [x] |
+| 4 | Confirmed that the GUI displays an error for an invalid drop and keeps a valid dropped path for later processing. | [x] |
+| 5 | Updated the Stage 2 checklist in `ROADMAP.md` for successful-load checking and invalid or unsupported image files. | [x] |
+| 6 | Ran `gui.py` and confirmed that the GUI window appears. | [x] |
+| 7 | Confirmed drag-and-drop image selection and the operation dropdown work. | [x] |
+| 8 | Marked “Build a simple GUI to select an input image” complete in `ROADMAP.md`. | [x] |
+| 9 | Adjusted `user_option()` in `main.py` to route either a terminal choice or the GUI's operation choice. | [x] |
+| 10 | Changed `main()` to receive the image path and operation, then reuse existing processing and saving functions. | [x] |
+| 11 | Connected the GUI's Process button to `main.py` and moved the saved-image confirmation into the GUI. | [x] |
 
 ### Extra
 
@@ -94,17 +92,17 @@ None.
 
 | # | Task | Status |
 |---:|---|---|
-| 1 | Reviewed `WORKFLOW.md` against the current GUI and backend design. | Done |
-| 2 | Removed the terminal menu from `main.py` and made it provide UI-independent validation and processing functions. | Done |
-| 3 | Connected `gui.py` to `main.py` for image validation, processing, and saving; the GUI displays errors and the returned output path. | Done |
-| 4 | Changed processing functions to receive an already loaded image, leaving image loading and operation routing to `main.py`. | Done |
-| 5 | Updated `save.py` to return the output path, report failed writes, and protect the source image if it matches the default output path. | Done |
-| 6 | Updated `WORKFLOW.md` to describe the implemented responsibilities and current behavior. | Done |
-| 7 | Ran the GUI resize-and-save workflow and confirmed the processed image was saved. | Done |
-| 8 | Explained what `validate_input()` checks and why `gui.py` calls it when an image is dropped. | Done |
-| 9 | Traced how `process_image()` selects an operation, loads and processes the image, and sends the result to `save.py`. | Done |
-| 10 | Explained what `gui.py` displays when the workflow succeeds or raises an error. | Done |
-| 11 | Ran the GUI flow and confirmed the behavior before changing code or checking off another roadmap item. | Done |
+| 1 | Reviewed `WORKFLOW.md` against the current GUI and backend design. | [x] |
+| 2 | Removed the terminal menu from `main.py` and made it provide UI-independent validation and processing functions. | [x] |
+| 3 | Connected `gui.py` to `main.py` for image validation, processing, and saving; the GUI displays errors and the returned output path. | [x] |
+| 4 | Changed processing functions to receive an already loaded image, leaving image loading and operation routing to `main.py`. | [x] |
+| 5 | Updated `save.py` to return the output path, report failed writes, and protect the source image if it matches the default output path. | [x] |
+| 6 | Updated `WORKFLOW.md` to describe the implemented responsibilities and current behavior. | [x] |
+| 7 | Ran the GUI resize-and-save workflow and confirmed the processed image was saved. | [x] |
+| 8 | Explained what `validate_input()` checks and why `gui.py` calls it when an image is dropped. | [x] |
+| 9 | Traced how `process_image()` selects an operation, loads and processes the image, and sends the result to `save.py`. | [x] |
+| 10 | Explained what `gui.py` displays when the workflow succeeds or raises an error. | [x] |
+| 11 | Ran the GUI flow and confirmed the behavior before changing code or checking off another roadmap item. | [x] |
 
 ### Extra
 
@@ -130,16 +128,16 @@ None.
 
 | # | Task | Status |
 |---:|---|---|
-| 1 | Displayed an image and reviewed OpenCV's BGR channel order, image shape, and pixel values. | Done |
-| 2 | Compared nearest, linear, cubic, and Lanczos interpolation methods. | Done |
+| 1 | Displayed an image and reviewed OpenCV's BGR channel order, image shape, and pixel values. | [x] |
+| 2 | Compared nearest, linear, cubic, and Lanczos interpolation methods. | [x] |
 
 ### Extra
 
 | # | Task | Status |
 |---:|---|---|
-| 1 | Compared an original image with one downscaled and enlarged again; observed the limits of traditional upscaling. | Done |
-| 2 | Added the crop operation to the GUI workflow and confirmed the saved crop shape was 400 × 400 × 3. | Done |
-| 3 | Applied Gaussian blur and sharpening filters; reviewed the sharpening kernel and confirmed the output dimensions and pixel values changed. | Done |
+| 1 | Compared an original image with one downscaled and enlarged again; observed the limits of traditional upscaling. | [x] |
+| 2 | Added the crop operation to the GUI workflow and confirmed the saved crop shape was 400 × 400 × 3. | [x] |
+| 3 | Applied Gaussian blur and sharpening filters; reviewed the sharpening kernel and confirmed the output dimensions and pixel values changed. | [x] |
 | 4 | Deferred brightness, contrast, and color adjustments to future development. | Deferred |
 
 ### Plan for the next session
@@ -162,17 +160,17 @@ None.
 
 | # | Task | Status |
 |---:|---|---|
-| 1 | Discussed features, labels, datasets, and predictions using cat, dog, and wolf examples. | Done |
-| 2 | Explained training, validation, and test sets, including why the test set is held back for final evaluation. | Done |
-| 3 | Worked through loss and optimization using cat/dog prediction probabilities. | Done |
+| 1 | Discussed features, labels, datasets, and predictions using cat, dog, and wolf examples. | [x] |
+| 2 | Explained training, validation, and test sets, including why the test set is held back for final evaluation. | [x] |
+| 3 | Worked through loss and optimization using cat/dog prediction probabilities. | [x] |
 
 ### Extra
 
 | # | Task | Status |
 |---:|---|---|
-| 1 | Discussed overfitting, generalization, data variety, data quality, and preprocessing with image examples. | Done |
-| 2 | Ran a small supervised cat/dog classifier demonstration using synthetic features, learned class centroids, and separate training, validation, and test examples. | Done |
-| 3 | Compared predictions with known labels and calculated 0–1 error rates for the tiny validation and test splits. | Done |
+| 1 | Discussed overfitting, generalization, data variety, data quality, and preprocessing with image examples. | [x] |
+| 2 | Ran a small supervised cat/dog classifier demonstration using synthetic features, learned class centroids, and separate training, validation, and test examples. | [x] |
+| 3 | Compared predictions with known labels and calculated 0–1 error rates for the tiny validation and test splits. | [x] |
 
 ### Plan for the next session
 
@@ -194,18 +192,18 @@ None.
 
 | # | Task | Status |
 |---:|---|---|
-| 1 | Learned how tensors and layers represent and process image data. | Done |
-| 2 | Understood how weights, biases, and activation functions affect layer calculations. | Done |
-| 3 | Traced a forward pass from input values through layers to an output. | Done |
+| 1 | Learned how tensors and layers represent and process image data. | [x] |
+| 2 | Understood how weights, biases, and activation functions affect layer calculations. | [x] |
+| 3 | Traced a forward pass from input values through layers to an output. | [x] |
 
 ### Extra
 
 | # | Task | Status |
 |---:|---|---|
-| 1 | Learned how backpropagation uses prediction error to update weights and biases. | Done |
-| 2 | Learned how epochs, batches, and learning rate shape the training process. | Done |
-| 3 | Learned how CNN filters produce feature maps and how layers can combine image features. | Done |
-| 4 | Ran a small neural-network example in the project virtual environment; one training update reduced the loss from 0.2113 to 0.1460. | Done |
+| 1 | Learned how backpropagation uses prediction error to update weights and biases. | [x] |
+| 2 | Learned how epochs, batches, and learning rate shape the training process. | [x] |
+| 3 | Learned how CNN filters produce feature maps and how layers can combine image features. | [x] |
+| 4 | Ran a small neural-network example in the project virtual environment; one training update reduced the loss from 0.2113 to 0.1460. | [x] |
 
 ### Plan for the next session
 
@@ -227,16 +225,16 @@ None.
 
 | # | Task | Status |
 |---:|---|---|
-| 1 | Learned how tensor normalization changes pixel values without changing tensor shape. | Done |
-| 2 | Learned how PyTorch selects a CPU or CUDA device and how `.to(device)` moves a tensor while preserving its values and shape. | Done |
-| 3 | Learned how a `Dataset` pairs each image with its label and how a `DataLoader` groups those pairs into batches. | Done |
+| 1 | Learned how tensor normalization changes pixel values without changing tensor shape. | [x] |
+| 2 | Learned how PyTorch selects a CPU or CUDA device and how `.to(device)` moves a tensor while preserving its values and shape. | [x] |
+| 3 | Learned how a `Dataset` pairs each image with its label and how a `DataLoader` groups those pairs into batches. | [x] |
 
 ### Extra
 
 | # | Task | Status |
 |---:|---|---|
-| 1 | Organized the learning scripts under `test/` by roadmap stage. | Done |
-| 2 | Documented the stage-based learning examples in `README.md`. | Done |
+| 1 | Organized the learning scripts under `test/` by roadmap stage. | [x] |
+| 2 | Documented the stage-based learning examples in `README.md`. | [x] |
 
 ### Plan for the next session
 
@@ -258,16 +256,16 @@ None.
 
 | # | Task | Status |
 |---:|---|---|
-| 1 | Define a model with `torch.nn`. | Done |
-| 2 | Write a training loop. | Done |
-| 3 | Calculate loss and update model parameters. | Done |
+| 1 | Define a model with `torch.nn`. | [x] |
+| 2 | Write a training loop. | [x] |
+| 3 | Calculate loss and update model parameters. | [x] |
 
 ### Extra
 
 | # | Task | Status |
 |---:|---|---|
-| 1 | Save and load model weights. | Done |
-| 2 | Track training and validation loss. | Done |
+| 1 | Save and load model weights. | [x] |
+| 2 | Track training and validation loss. | [x] |
 
 ### Plan for the next session
 
@@ -286,14 +284,14 @@ None.
 
 | # | Task | Status |
 |---:|---|---|
-| 1 | Researched beginner-friendly super-resolution models, including SRCNN and ESPCN. | Done |
-| 2 | Selected five Wikimedia Commons images and reviewed their usage licence information. | Done |
+| 1 | Researched beginner-friendly super-resolution models, including SRCNN and ESPCN. | [x] |
+| 2 | Selected five Wikimedia Commons images and reviewed their usage licence information. | [x] |
 
 ### Extra
 
 | # | Task | Status |
 |---:|---|---|
-| 1 | Created low-resolution copies for five high-resolution images and paired them with their originals. | Done |
+| 1 | Created low-resolution copies for five high-resolution images and paired them with their originals. | [x] |
 
 ### Plan for the next session
 
@@ -303,4 +301,80 @@ None.
 
 | # | Learning task | Status |
 |---:|---|---|
-| 1 | Trace one low-resolution tensor through the baseline model and explain the shape changes at each stage. | [ ] |
+| 1 | Trace one low-resolution tensor through the baseline model and explain the shape changes at each stage. | [x] |
+
+---
+
+# 2026-10-25
+
+### What we did
+
+| # | Task | Status |
+|---:|---|---|
+| 1 | Traced a grayscale low-resolution tensor through ESPCN, including convolution channel changes, preserved spatial dimensions, and PixelShuffle's 2× output shape. | [x] |
+| 2 | Explained why PixelShuffle needs four channels for grayscale 2× upscaling and generalized the channel count to upscale factor squared. | [x] |
+
+### Extra
+
+None.
+
+### Plan for the next session
+
+- Postpone the four remaining Stage 7 objectives and finish the stage. Begin Stage 8.
+
+### Tomorrow's learning checklist
+
+| # | Learning task | Status |
+|---:|---|---|
+| 1 | Review what has become difficult to maintain | [x] |
+| 2 | Separate image I/O, processing, model inference, and UI responsibilities | [x] |
+| 3 | Define clear class and method responsibilities | [x] |
+
+# 2026-10-26
+
+### What we did
+
+| # | Task | Status |
+|---:|---|---|
+| 1 | Review what has become difficult to maintain | [x] |
+| 2 | Separate image I/O, processing, model inference, and UI responsibilities | [x] |
+| 3 | Define clear class and method responsibilities | [x] |
+
+### Extra
+
+None.
+
+### Plan for the next session
+
+- Continue stage 8.
+
+### Tomorrow's learning checklist
+
+# 2026-10-27
+
+### What we did
+
+| # | Task | Status |
+|---:|---|---|
+| 1 | Review what has become difficult to maintain | [x] |
+| 2 | Separate image I/O, processing, model inference, and UI responsibilities | [x] |
+| 3 | Define clear class and method responsibilities | [x] |
+
+### Extra
+
+| # | Task | Status |
+|---:|---|---|
+| 1 | Reviewed inheritance and composition; concluded the current image-operation functions do not need an additional class hierarchy. | [x] |
+| 2 | Added input-type and minimum-dimension validation to `crop_image()` with clear errors. | [x] |
+| 3 | Added pytest unit tests for the crop result, undersized images, and non-NumPy input; confirmed the tests pass with `python -m pytest tests/test_crop.py`. | [x] |
+| 4 | Refactored the GUI operation menu to use the keys from `main.py`'s `OPERATIONS` mapping instead of repeating the labels. | [x] |
+
+### Plan for the next session
+
+- Begin Stage 9 — Generative AI Enhancement.
+
+### Tomorrow's learning checklist
+
+| # | Learning task | Status |
+|---:|---|---|
+| 1 | Learn the difference between restoration, super-resolution, and generative enhancement. | [ ] |

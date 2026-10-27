@@ -14,6 +14,7 @@ The **Enhance** option is listed in the interface but is not implemented yet.
 
 - Python 3.10 or newer
 - Packages listed in `requirements.txt`
+- Pytest is needed only to run the automated tests: `python -m pip install pytest`
 
 ## Setup
 
@@ -35,11 +36,26 @@ Drag an image into the window, choose an operation, then select **Process image*
 ## Project files
 
 - `Project Ai Enhancer Toolkit/` — application and image-processing modules
+- `tests/` — automated pytest tests for application functions
 - `resource/` — sample project resources
 - `test/` — local learning examples arranged by roadmap stage; this folder is currently excluded by `.gitignore`
 - `ROADMAP.md` — learning checklist
 - `PROGRESS.md` — session progress and next learning plan
 - `WORKFLOW.md` — application flow and module responsibilities
+
+## Run tests
+
+Install pytest in the active environment:
+
+```text
+python -m pip install pytest
+```
+
+From the repository root, run:
+
+```text
+python -m pytest tests/test_crop.py
+```
 
 ## Learning examples
 
@@ -48,6 +64,12 @@ Drag an image into the window, choose an operation, then select **Process image*
 - **Stage 5 — Deep Learning:** `test/Stage 5/cnn.py` demonstrates a small neural network's forward pass, backpropagation, and one parameter update. Despite its filename, this example does not implement a CNN.
 - **Stage 6 — PyTorch:** `tensor.py` and `tensor2.py` introduce tensors and normalization; `device.py` selects CPU or CUDA; `dataset.py` defines a tiny image dataset and shows batches; `linear_model.py` demonstrates a `Linear` layer with known weights; `train_classifier.py` trains a small classifier and saves its weights; `save_load_model.py` loads those weights; `training_validation_loss.py` compares loss on separate toy training and validation examples. Run `train_classifier.py` before `save_load_model.py`. The four-image dataset is only for learning the mechanics, not for meaningful model evaluation.
 
-The current learning focus is Stage 7: understanding and building a beginner-friendly super-resolution baseline. Training and evaluation will follow once the baseline is understood.
+The current learning focus is Stage 9: Generative AI Enhancement. The remaining Stage 7 super-resolution objectives are postponed for now.
+
+### Stage 7 — Super-Resolution
+
+- `test/Stage 7/low_reso.py` creates low-resolution copies from the high-resolution dataset by resizing each image to half its width and height.
+- `test/Stage 7/espcn.py` defines and trains a grayscale ESPCN model for 2× upscaling. It uses paired low- and high-resolution images, reserves `Alexei_Leonov.jpg` for a held-out inference example, and saves the model weights and output image beside the learning script and in `test/SR_results/`, respectively.
+- `test/Stage 7/model_comparison.py` demonstrates the tensor shape flow of SRCNN-style and ESPCN-style upscaling on a small example. It compares their stages and shapes, not their image quality or runtime.
 
 No AI model is currently bundled or used. Model and dataset licensing will be documented if they are added.
