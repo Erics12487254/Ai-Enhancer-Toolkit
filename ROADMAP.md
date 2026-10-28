@@ -81,14 +81,14 @@
   - [x] Add or improve unit tests
   - [x] Refactor without changing expected behavior
 
-- [ ] **Stage 9 — Generative AI Enhancement** *(3–6 weeks)*
-  - [ ] Learn the difference between restoration, super-resolution, and generative enhancement
-  - [ ] Explore a suitable pretrained generative/image-restoration approach
-  - [ ] Check model licence, hardware requirements, and dependencies
-  - [ ] Run inference on sample images
-  - [ ] Compare outputs with the super-resolution baseline
-  - [ ] Check for invented details, distorted faces, or other artifacts
-  - [ ] Document when the generative approach is and is not appropriate
+- [x] **Stage 9 — Generative AI Enhancement** *(3–6 weeks)*
+  - [x] Learn the difference between restoration, super-resolution, and generative enhancement
+  - [x] Explore a suitable pretrained generative/image-restoration approach
+  - [x] Check model licence, hardware requirements, and dependencies
+  - [x] Run inference on sample images
+  - [x] Compare outputs with the super-resolution baseline
+  - [x] Check for invented details, distorted faces, or other artifacts
+  - [x] Document when the generative approach is and is not appropriate
 
 - [ ] **Stage 10 — Evaluation** *(2–3 weeks)*
   - [ ] Understand PSNR and what it measures

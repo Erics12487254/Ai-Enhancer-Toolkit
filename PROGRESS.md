@@ -378,3 +378,37 @@ None.
 | # | Learning task | Status |
 |---:|---|---|
 | 1 | Learn the difference between restoration, super-resolution, and generative enhancement. | [ ] |
+
+---
+
+# 2026-10-29
+
+### What we did
+
+| # | Task | Status |
+|---:|---|---|
+| 1 | Learned the difference between restoration, super-resolution, and generative enhancement, including that models estimate details that are missing from a low-resolution image. | [x] |
+| 2 | Explored Real-ESRGAN as a pretrained image-restoration approach for the project’s wallpaper use case. | [x] |
+| 3 | Reviewed the model’s licence, hardware, and dependencies: the repository code uses BSD-3-Clause, separate pretrained-weight terms were not clear in the repository, the laptop has Intel Arc 140T graphics, and the portable NCNN Vulkan build avoids adding BasicSR to the project environment. | [x] |
+
+### Extra
+
+| # | Task | Status |
+|---:|---|---|
+| 1 | Ran Real-ESRGAN inference on sample images and compared its output with the super-resolution baseline. | [x] |
+| 2 | Reviewed artifacts: the very blurry portrait became uncanny, while the clearer anime image retained coherent linework. | [x] |
+| 3 | Concluded that enhancement works better when the source has enough detail; very small or blurry images leave the model to guess. | [x] |
+| 4 | Observed that 4× upscaling produced a 10,200 × 5,624 image of about 51 MB and increased fan noise during processing. | [x] |
+
+### Plan for the next session
+
+- Begin Stage 10 — Evaluation.
+- Learn PSNR and SSIM, then evaluate outputs against suitable reference images.
+
+### Tomorrow's learning checklist
+
+| # | Learning task | Status |
+|---:|---|---|
+| 1 | Understand PSNR and what it measures. | [ ] |
+| 2 | Understand SSIM and what it measures. | [ ] |
+| 3 | Evaluate outputs against suitable reference images. | [ ] |
