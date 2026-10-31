@@ -90,15 +90,15 @@
   - [x] Check for invented details, distorted faces, or other artifacts
   - [x] Document when the generative approach is and is not appropriate
 
-- [ ] **Stage 10 — Evaluation** *(2–3 weeks)*
-  - [ ] Understand PSNR and what it measures
-  - [ ] Understand SSIM and what it measures
-  - [ ] Evaluate outputs against suitable reference images
-  - [ ] Compare traditional interpolation, the SR model, and the generative approach
-  - [ ] Keep test images and settings consistent
-  - [ ] Create a results table with metrics and runtime
-  - [ ] Include side-by-side visual comparisons
-  - [ ] Explain metric limitations and observed failure cases
+- [x] **Stage 10 — Evaluation** *(2–3 weeks)*
+  - [x] Understand PSNR and what it measures
+  - [x] Understand SSIM and what it measures
+  - [x] Evaluate outputs against suitable reference images
+  - [x] Compare traditional interpolation, the SR model, and the generative approach
+  - [x] Keep test images and settings consistent
+  - [x] Create a results table with metrics and runtime
+  - [x] Include side-by-side visual comparisons
+  - [x] Explain metric limitations and observed failure cases
 
 - [ ] **Stage 11 — Final Application** *(2–4 weeks)*
   - [x] Build a simple GUI to select an input image

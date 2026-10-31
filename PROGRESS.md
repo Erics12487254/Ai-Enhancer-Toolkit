@@ -409,6 +409,38 @@ None.
 
 | # | Learning task | Status |
 |---:|---|---|
-| 1 | Understand PSNR and what it measures. | [ ] |
-| 2 | Understand SSIM and what it measures. | [ ] |
-| 3 | Evaluate outputs against suitable reference images. | [ ] |
+| 1 | Understand PSNR and what it measures. | [x] |
+| 2 | Understand SSIM and what it measures. | [x] |
+| 3 | Evaluate outputs against suitable reference images. | [x] |
+
+# 2026-10-31
+
+### What we did
+
+| # | Task | Status |
+|---:|---|---|
+| 1 | Understand PSNR and what it measures. | [x] |
+| 2 | Understand SSIM and what it measures. | [x] |
+| 3 | Evaluate outputs against suitable reference images. | [x] |
+
+### Extra
+
+| # | Task | Status |
+|---:|---|---|
+| 1 | Compare traditional interpolation, the SR model, and the generative approach. | [x] |
+| 2 | Keep test images and settings consistent. | [x] |
+| 3 | Create a results table with metrics and runtime. | [x] |
+| 4 | Include side-by-side visual comparisons. | [x] |
+| 5 | Explain metric limitations and observed failure cases. | [x] |
+
+Postponed pratical steps. Conceptual learning is finished
+
+### Plan for the next session
+
+- Continue Stage 11 — Final Application.
+
+### Tomorrow's learning checklist
+
+| 1 | Let the user choose an enhancement method and settings. | [] |
+| 2 | Let the user choose where to save the output.| [] |
+| 3 | Keep the interface responsive during processing where practical. | [] |
