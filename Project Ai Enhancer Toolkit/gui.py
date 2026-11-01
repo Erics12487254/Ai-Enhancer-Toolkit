@@ -1,6 +1,5 @@
 
 import base64
-import sqlite3
 import tkinter as tk
 from pathlib import Path
 
@@ -10,6 +9,7 @@ from tkinter import filedialog, messagebox
 from tkinterdnd2 import DND_FILES, TkinterDnD
 
 from main import (
+    ApplicationError,
     OPERATIONS,
     process_image,
     validate_input,
@@ -253,7 +253,7 @@ class ToolkitGUI:
             ValueError,
             OSError,
             RuntimeError,
-            sqlite3.Error,
+            ApplicationError,
             cv2.error
         ) as error:
 
@@ -283,7 +283,7 @@ class ToolkitGUI:
         try:
             images = get_gallery_images()
 
-        except sqlite3.Error as error:
+        except ApplicationError as error:
             messagebox.showerror(
                 "Gallery error",
                 str(error)
@@ -428,7 +428,7 @@ class ToolkitGUI:
                 destination
             )
 
-        except (ValueError, OSError, sqlite3.Error) as error:
+        except (ValueError, OSError, ApplicationError) as error:
 
             messagebox.showerror(
                 "Download failed",
@@ -458,7 +458,7 @@ class ToolkitGUI:
         try:
             delete_image(record["id"])
 
-        except (ValueError, OSError, sqlite3.Error) as error:
+        except (ValueError, OSError, ApplicationError) as error:
 
             messagebox.showerror(
                 "Deletion failed",
@@ -478,7 +478,7 @@ class ToolkitGUI:
             run_maintenance()
             self.refresh_gallery()
 
-        except (OSError, sqlite3.Error) as error:
+        except (OSError, ApplicationError) as error:
             print(f"Periodic maintenance failed: {error}")
 
         finally:
@@ -499,7 +499,7 @@ if __name__ == "__main__":
         # Initialize storage before building the gallery.
         initialize_app()
 
-    except (OSError, sqlite3.Error) as error:
+    except (OSError, ApplicationError) as error:
 
         messagebox.showerror(
             "Application startup failed",

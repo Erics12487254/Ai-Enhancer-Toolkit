@@ -45,6 +45,21 @@ OPERATIONS = {
 }
 
 
+class ApplicationError(Exception):
+    """A user-facing error raised by the application layer."""
+
+
+def _database_call(function, *args, **kwargs):
+    """Run a database operation without exposing SQLite errors to the GUI."""
+
+    try:
+        return function(*args, **kwargs)
+    except sqlite3.Error as error:
+        raise ApplicationError(
+            f"A database operation failed: {error}"
+        ) from error
+
+
 def _validate_path(path):
     """Ensure that an image path is provided."""
 
@@ -103,7 +118,8 @@ def process_image(path, operation, output_path=None):
 
     # Step 3: Register the image as pending.
     try:
-        image_id = add_image(
+        image_id = _database_call(
+            add_image,
             output_name=final_path.name,
             output_path=str(final_path.resolve()),
             staging_path=staged_path,
@@ -126,9 +142,9 @@ def process_image(path, operation, output_path=None):
         )
 
         # Step 5: Make the image visible to the gallery.
-        update_image_status(image_id, "ready")
+        _database_call(update_image_status, image_id, "ready")
 
-    except (OSError, sqlite3.Error) as error:
+    except (OSError, ApplicationError) as error:
         raise RuntimeError(
             "The image was registered but could not be fully published. "
             "The application will attempt recovery on its next maintenance run."
@@ -145,7 +161,7 @@ def recover_pending_images():
     Otherwise, try to publish the staged file.
     """
 
-    pending_images = get_pending_images()
+    pending_images = _database_call(get_pending_images)
 
     for record in pending_images:
 
@@ -161,7 +177,7 @@ def recover_pending_images():
             if final_path.is_file():
 
                 # The move succeeded, but the database update may have failed.
-                update_image_status(image_id, "ready")
+                _database_call(update_image_status, image_id, "ready")
 
                 if staged_path and staged_path.exists():
                     delete_image_file(staged_path)
@@ -174,14 +190,14 @@ def recover_pending_images():
                     final_path
                 )
 
-                update_image_status(image_id, "ready")
+                _database_call(update_image_status, image_id, "ready")
 
             else:
 
                 # Neither file exists, so remove the unusable record.
-                delete_image_record(image_id)
+                _database_call(delete_image_record, image_id)
 
-        except (OSError, sqlite3.Error) as error:
+        except (OSError, ApplicationError) as error:
             print(
                 f"Could not recover image {image_id}: {error}"
             )
@@ -197,7 +213,7 @@ def cleanup_orphan_staging_files():
         exist_ok=True
     )
 
-    pending_images = get_pending_images()
+    pending_images = _database_call(get_pending_images)
 
     known_staging_paths = {
         Path(record["staging_path"]).resolve()
@@ -223,7 +239,7 @@ def cleanup_orphan_staging_files():
 def cleanup_expired_images():
     """Delete expired image files and their database records."""
 
-    expired_images = mark_expired_images()
+    expired_images = _database_call(mark_expired_images)
 
     for image_id, output_path in expired_images:
 
@@ -232,9 +248,9 @@ def cleanup_expired_images():
             delete_image_file(output_path)
 
             # Only then remove its database record.
-            delete_image_record(image_id)
+            _database_call(delete_image_record, image_id)
 
-        except (OSError, sqlite3.Error) as error:
+        except (OSError, ApplicationError) as error:
             # The deleting record remains for another attempt.
             print(
                 f"Could not delete expired image "
@@ -245,24 +261,24 @@ def cleanup_expired_images():
 def delete_image(image_id):
     """Delete one gallery image and its database record."""
 
-    record = get_image(image_id)
+    record = _database_call(get_image, image_id)
 
     if record is None:
         raise ValueError("Image record was not found.")
 
     # Hide it from the gallery before attempting deletion.
-    update_image_status(image_id, "deleting")
+    _database_call(update_image_status, image_id, "deleting")
 
     # If file deletion fails, the deleting record remains for retry.
     delete_image_file(record["output_path"])
 
-    delete_image_record(image_id)
+    _database_call(delete_image_record, image_id)
 
 
 def download_image(image_id, destination_path):
     """Copy one gallery image to the user's chosen location."""
 
-    record = get_image(image_id)
+    record = _database_call(get_image, image_id)
 
     if record is None or record["status"] != "ready":
         raise ValueError("Image is not available for download.")
@@ -277,7 +293,7 @@ def run_maintenance():
     """Run storage recovery, synchronization, and expiration cleanup."""
 
     recover_pending_images()
-    synchronize_images()
+    _database_call(synchronize_images)
     cleanup_expired_images()
     cleanup_orphan_staging_files()
 
@@ -285,11 +301,11 @@ def run_maintenance():
 def initialize_app():
     """Initialize the database and perform startup maintenance."""
 
-    initialize_database()
+    _database_call(initialize_database)
     run_maintenance()
 
 
 def get_gallery_images():
     """Return the images currently available to the gallery."""
 
-    return get_images()
+    return _database_call(get_images)
