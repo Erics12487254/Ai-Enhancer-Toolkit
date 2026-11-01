@@ -1,13 +1,39 @@
-import cv2
 
-# Application workflow: validate input, run the requested operation, then save its result.
+import cv2
+import sqlite3
+from pathlib import Path
+
+# Image processing operations.
 from enhance import enhance_image
 from loader import load_image
 from resize import resize_image
-from save import save_image
 from crop import crop_image
 from blur import blur_image
 from sharpen import sharpen_image
+
+# Image storage operations.
+from save import (
+    OUTPUT_DIR,
+    STAGING_DIR,
+    create_staged_image,
+    get_final_path,
+    publish_staged_image,
+    delete_image_file,
+    copy_image
+)
+
+# Database operations.
+from database.database import (
+    add_image,
+    update_image_status,
+    get_image,
+    get_pending_images,
+    initialize_database,
+    synchronize_images,
+    mark_expired_images,
+    delete_image_record,
+    get_images
+)
 
 
 OPERATIONS = {
@@ -18,38 +44,252 @@ OPERATIONS = {
     "Sharpen the image": sharpen_image
 }
 
+
 def _validate_path(path):
+    """Ensure that an image path is provided."""
+
     if not isinstance(path, str) or not path.strip():
         raise ValueError("Select an image first.")
 
 
 def validate_input(path):
     """Check that OpenCV can decode the selected image."""
+
     _validate_path(path)
     load_image(path)
+
     return path
 
-# Validate the path even if the caller skipped validate_input().
-def process_image(path, operation, output_path=None): 
-    """Run one supported operation and save the result; return its location."""
+
+def process_image(path, operation, output_path=None):
+    """
+    Process an image, stage it, register it,
+    and publish it to permanent storage.
+    """
+
     _validate_path(path)
 
     try:
         operation_function = OPERATIONS[operation]
+
     except (KeyError, TypeError):
         raise ValueError("Choose a valid operation.") from None
 
-    image = load_image((path))
+    image = load_image(path)
+
     try:
         result = operation_function(image)
-    except cv2.error as error:
-        raise ValueError(f"Could not process the image: {error}") from error
 
-    #will be remove later
+    except cv2.error as error:
+        raise ValueError(
+            f"Could not process the image: {error}"
+        ) from error
+
     if result is None:
-        raise ValueError(f"{operation} is not implemented yet.")
+        raise ValueError(
+            f"{operation} is not implemented yet."
+        )
 
+    if output_path is not None:
+        raise ValueError(
+            "Custom output paths are not supported by the gallery workflow yet."
+        )
+
+    # Step 1: Write the processed image to temporary storage.
+    staged_path = create_staged_image(result)
+
+    # Step 2: Determine its permanent destination.
+    final_path = get_final_path(staged_path)
+
+    # Step 3: Register the image as pending.
     try:
-        return save_image(result, output_path=output_path, source_path=path)#source_path=protect from being overwritten, Output path: where to write the processed result.
-    except cv2.error as error:
-        raise ValueError(f"Could not save the processed image: {error}") from error
+        image_id = add_image(
+            output_name=final_path.name,
+            output_path=str(final_path.resolve()),
+            staging_path=staged_path,
+            operation=operation,
+            width=result.shape[1],
+            height=result.shape[0]
+        )
+
+    except Exception:
+        # If registration fails, remove the unregistered staged file.
+        delete_image_file(staged_path)
+        raise
+
+    # Step 4: Move the staged image into permanent storage.
+    # If this fails, the pending record remains for recovery.
+    try:
+        publish_staged_image(
+            staged_path,
+            final_path
+        )
+
+        # Step 5: Make the image visible to the gallery.
+        update_image_status(image_id, "ready")
+
+    except (OSError, sqlite3.Error) as error:
+        raise RuntimeError(
+            "The image was registered but could not be fully published. "
+            "The application will attempt recovery on its next maintenance run."
+        ) from error
+
+    return str(final_path.resolve())
+
+
+def recover_pending_images():
+    """
+    Recover interrupted saves.
+
+    If the final file exists, mark it ready.
+    Otherwise, try to publish the staged file.
+    """
+
+    pending_images = get_pending_images()
+
+    for record in pending_images:
+
+        image_id = record["id"]
+        final_path = Path(record["output_path"])
+        staged_path = (
+            Path(record["staging_path"])
+            if record["staging_path"]
+            else None
+        )
+
+        try:
+            if final_path.is_file():
+
+                # The move succeeded, but the database update may have failed.
+                update_image_status(image_id, "ready")
+
+                if staged_path and staged_path.exists():
+                    delete_image_file(staged_path)
+
+            elif staged_path and staged_path.is_file():
+
+                # The application stopped before publishing the image.
+                publish_staged_image(
+                    staged_path,
+                    final_path
+                )
+
+                update_image_status(image_id, "ready")
+
+            else:
+
+                # Neither file exists, so remove the unusable record.
+                delete_image_record(image_id)
+
+        except (OSError, sqlite3.Error) as error:
+            print(
+                f"Could not recover image {image_id}: {error}"
+            )
+
+
+def cleanup_orphan_staging_files():
+    """
+    Remove staged files that have no pending database record.
+    """
+
+    STAGING_DIR.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+    pending_images = get_pending_images()
+
+    known_staging_paths = {
+        Path(record["staging_path"]).resolve()
+        for record in pending_images
+        if record["staging_path"]
+    }
+
+    for staged_file in STAGING_DIR.iterdir():
+
+        if staged_file.is_file():
+            if staged_file.resolve() not in known_staging_paths:
+
+                try:
+                    delete_image_file(staged_file)
+
+                except OSError as error:
+                    print(
+                        f"Could not remove temporary file "
+                        f"{staged_file}: {error}"
+                    )
+
+
+def cleanup_expired_images():
+    """Delete expired image files and their database records."""
+
+    expired_images = mark_expired_images()
+
+    for image_id, output_path in expired_images:
+
+        try:
+            # Remove the actual image file first.
+            delete_image_file(output_path)
+
+            # Only then remove its database record.
+            delete_image_record(image_id)
+
+        except (OSError, sqlite3.Error) as error:
+            # The deleting record remains for another attempt.
+            print(
+                f"Could not delete expired image "
+                f"{output_path}: {error}"
+            )
+
+
+def delete_image(image_id):
+    """Delete one gallery image and its database record."""
+
+    record = get_image(image_id)
+
+    if record is None:
+        raise ValueError("Image record was not found.")
+
+    # Hide it from the gallery before attempting deletion.
+    update_image_status(image_id, "deleting")
+
+    # If file deletion fails, the deleting record remains for retry.
+    delete_image_file(record["output_path"])
+
+    delete_image_record(image_id)
+
+
+def download_image(image_id, destination_path):
+    """Copy one gallery image to the user's chosen location."""
+
+    record = get_image(image_id)
+
+    if record is None or record["status"] != "ready":
+        raise ValueError("Image is not available for download.")
+
+    return copy_image(
+        record["output_path"],
+        destination_path
+    )
+
+
+def run_maintenance():
+    """Run storage recovery, synchronization, and expiration cleanup."""
+
+    recover_pending_images()
+    synchronize_images()
+    cleanup_expired_images()
+    cleanup_orphan_staging_files()
+
+
+def initialize_app():
+    """Initialize the database and perform startup maintenance."""
+
+    initialize_database()
+    run_maintenance()
+
+
+def get_gallery_images():
+    """Return the images currently available to the gallery."""
+
+    return get_images()
