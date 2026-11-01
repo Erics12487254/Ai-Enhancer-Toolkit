@@ -102,13 +102,13 @@
 
 - [ ] **Stage 11 — Final Application** *(2–4 weeks)*
   - [x] Build a simple GUI to select an input image
-  - [ ] Let the user choose an enhancement method and settings
-  - [ ] Let the user choose where to save the output
+  - [postpone] Let the user choose an enhancement method and settings
+  - [x] Let the user choose where to save the output
   - [x] Show useful progress, success, and error messages
-  - [ ] Keep the interface responsive during processing where practical
-  - [ ] Organize the project files and dependencies
-  - [ ] Add installation and usage instructions to `README.md`
-  - [ ] Include example images and evaluation results
+  - [x] Keep the interface responsive during processing where practical
+  - [x] Organize the project files and dependencies
+  - [x] Add installation and usage instructions to `README.md`
+  - [x] Include example images and evaluation results
   - [ ] Add tests for key functionality
   - [ ] Check licences and acknowledge external models/datasets
   - [ ] Remove temporary files, debug output, and unused code

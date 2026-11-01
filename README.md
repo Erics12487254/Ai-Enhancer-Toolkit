@@ -1,66 +1,116 @@
 # AI Enhancer Toolkit
 
-A Python image-processing app with a drag-and-drop desktop interface. AI enhancement is planned for a future version.
+A Python image-processing application with a drag-and-drop desktop interface and a persistent image gallery. AI enhancement is planned for a future version.
 
 ## Features
 
-- Resize, crop, blur, and sharpen images
-- Drag and drop an image, choose an operation, and save the result as `saved_image.jpg`
-- Validate image files and show processing errors in the interface
+- Resize, crop, blur, and sharpen images.
+- Drag and drop an image, choose an operation, and process it through the desktop interface.
+- Validate image files and display processing errors.
+- Store processed images in a persistent gallery.
+- Keep image metadata in an SQLite database.
+- Download or delete images from the gallery.
+- Automatically remove gallery images after 30 days.
+- Recover interrupted image-saving operations.
 
 The **Enhance** option is listed in the interface but is not implemented yet.
 
 ## Requirements
 
-- Python 3.10 or newer
-- Packages listed in `requirements.txt`
-- Pytest is needed only to run the automated tests: `python -m pip install pytest`
+- Python 3.10 or newer.
+- Packages listed in `requirements.txt`.
+- Pytest is required only for running automated tests.
 
-## Setup
+## Installation
 
-From the project folder, create a virtual environment and install the dependencies:
+### 1. Clone the repository
 
-```text
+```powershell
+git clone https://github.com/Erics12487254/Ai-Enhancer-Toolkit.git
+cd Ai-Enhancer-Toolkit
+```
+
+### 2. Create a virtual environment
+
+```powershell
 python -m venv .venv
+```
+
+### 3. Activate the virtual environment
+
+For Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+If PowerShell blocks script execution, you may need to adjust the execution policy for your current user.
+
+### 4. Install dependencies
+
+```powershell
 python -m pip install -r requirements.txt
 ```
 
-## Run
-
-```text
-python "Project Ai Enhancer Toolkit/gui.py"
-```
-
-Drag an image into the window, choose an operation, then select **Process image**. The result is saved in the current working directory. If the default output path would overwrite the input, the app uses `saved_image_processed.jpg` instead.
-
-## Project files
-
-- `Project Ai Enhancer Toolkit/` — application and image-processing modules
-- `tests/` — automated pytest tests for application functions
-- `resource/` — sample project resources
-- `test/` — local learning examples arranged by roadmap stage; this folder is currently excluded by `.gitignore`
-- `exercise/` — separate learning and experimentation files, including super-resolution evaluation
-- `ROADMAP.md` — learning checklist
-- `PROGRESS.md` — session progress and next learning plan
-- `WORKFLOW.md` — application flow and module responsibilities
-
-## Run tests
-
-Install pytest in the active environment:
-
-```text
-python -m pip install pytest
-```
+## Running the Application
 
 From the repository root, run:
 
-```text
-python -m pytest tests/test_crop.py
+```powershell
+python "Project Ai Enhancer Toolkit/gui.py"
 ```
 
-## Learning examples
+### Using the Application
 
-## Learning examples
+1. Open the application.
+2. Drag and drop an image into the input area.
+3. Choose an available processing operation.
+4. Select **Process image**.
+5. The processed image is saved in the application's `saved_images/` directory and appears in the gallery.
+6. Use the gallery's **Download** option to copy an image to a chosen destination.
+7. Use **Delete** to remove an image from the gallery.
+
+Gallery images and their metadata persist after the application is closed.
+
+Images are automatically removed after 30 days, based on their processing timestamp. The application also performs maintenance to recover interrupted saves and synchronize missing image files.
+
+## Running Automated Tests
+
+The automated tests are located inside `Project Ai Enhancer Toolkit/tests/`.
+
+Install pytest in the active virtual environment:
+
+```powershell
+python -m pip install pytest
+```
+
+From the repository root, enter the application directory:
+
+```powershell
+cd "Project Ai Enhancer Toolkit"
+```
+
+Run the storage and gallery tests:
+
+```powershell
+python -m pytest tests/test_storage.py -v
+```
+
+## Project Structure
+
+- `Project Ai Enhancer Toolkit/` — application and image-processing modules.
+  - `database/` — SQLite database and database operations.
+  - `saved_images/` — persistent storage for processed images.
+  - `.staging_images/` — temporary staging area used during image saving.
+  - `tests/` — automated tests for application functionality.
+- `resource/` — sample project resources.
+- `test/` — local learning examples arranged by roadmap stage; this folder is currently excluded by `.gitignore`.
+- `exercise/` — separate learning and experimentation files, including super-resolution evaluation.
+- `ROADMAP.md` — learning checklist.
+- `PROGRESS.md` — session progress and next learning plan.
+- `WORKFLOW.md` — application flow and module responsibilities.
+
+## Learning Examples
 
 ### Stage 2 — OpenCV
 
@@ -108,13 +158,13 @@ Compared three image upscaling approaches using the same low-resolution input im
 
 The evaluation workflow is located in `exercise/Stage 10/`.
 
-#### Evaluation metrics
+#### Evaluation Metrics
 
 - **PSNR (Peak Signal-to-Noise Ratio):** Measures pixel-level similarity between the generated output and reference image. Higher values indicate greater numerical similarity.
 - **SSIM (Structural Similarity Index):** Measures structural similarity between the generated output and reference image. Higher values indicate greater similarity.
 - **Runtime:** Measures the processing time required by each method. Lower values indicate faster processing.
 
-#### Experimental results
+#### Experimental Results
 
 The following results were obtained using `Alexei_Leonov.jpg`, with all outputs standardized to 3844 × 3075 pixels.
 
@@ -124,7 +174,7 @@ The following results were obtained using `Alexei_Leonov.jpg`, with all outputs 
 | ESPCN | 15.5001 | 0.5581 | 0.7384 |
 | Real-ESRGAN | 31.2559 | 0.8255 | 79.8095 |
 
-#### Evaluation workflow
+#### Evaluation Workflow
 
 - `quality_evaluator.py` coordinates the evaluation of all three methods.
 - `realesrgan_test.py` runs Real-ESRGAN using its separate Python environment.
@@ -140,7 +190,7 @@ python "exercise/Stage 10/quality_evaluator.py"
 
 Real-ESRGAN runs on the CPU in the current setup and takes significantly longer than the other methods. Keep the device adequately ventilated during evaluation.
 
-#### Observations and limitations
+#### Observations and Limitations
 
 - **Bicubic:** Fastest method and achieved the highest PSNR and SSIM in this experiment. However, interpolation cannot reconstruct genuinely missing image details.
 - **ESPCN:** Requires more processing time than Bicubic. Its relatively low evaluation scores may be related to the limited training dataset and model training process.
@@ -148,10 +198,22 @@ Real-ESRGAN runs on the CPU in the current setup and takes significantly longer 
 
 PSNR and SSIM do not fully represent perceived image quality. Furthermore, this experiment uses only one reference image, so the results should not be treated as universal rankings of the three approaches.
 
-## Current development status
+## Current Development Status
 
-The current learning focus is Stage 10: Super-Resolution Evaluation.
+The current development focus is **Stage 11 — Final Application**.
 
-The super-resolution models and Real-ESRGAN inference workflow are experimental learning components. They are not integrated into the desktop application.
+### Recent Progress
+
+- Implemented persistent image storage using a dedicated `saved_images/` directory.
+- Added SQLite-backed gallery metadata storage.
+- Implemented a staging and publishing workflow to reduce the risk of incomplete image saves.
+- Added recovery for interrupted image-saving operations.
+- Implemented gallery image downloading and deletion.
+- Added automatic expiration and cleanup of images after 30 days.
+- Added synchronization between stored image files and database records.
+- Added seven automated storage and gallery tests. All seven passed.
+- Manually verified image persistence after restarting the application, downloading images, and deleting gallery images.
+
+The super-resolution models and Real-ESRGAN inference workflow remain experimental learning components. They are not integrated into the desktop application.
 
 No AI model is currently integrated into or bundled with the application. Model and dataset licensing will be documented if they are added to the project.

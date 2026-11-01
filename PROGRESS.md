@@ -437,10 +437,33 @@ Postponed pratical steps. Conceptual learning is finished
 
 ### Plan for the next session
 
+### Tomorrow's learning checklist
+
+| 1 | Let the user choose an enhancement method and settings. | [x] |
+| 3 | Keep the interface responsive during processing where practical. | [x] |
+
+# 2026-11-01
+
+### What we did
+
+| # | Task | Status |
+|---:|---|---|
+| 2 | Let the user choose where to save the output. | [x] |
+| 4 | Keep the interface responsive during processing where practical. | [x] |
+
+### Extra
+
+| # | Task | Status |
+|---:|---|---|
+| 1 | Organize the project files and dependencies. | [x] |
+| 2 | Add installation and usage instructions to `README.md`. | [x] |
+| 3 | Include example images and evaluation results. | [x] |
+
+### Plan for the next session
+
 - Continue Stage 11 — Final Application.
 
 ### Tomorrow's learning checklist
 
-| 1 | Let the user choose an enhancement method and settings. | [] |
-| 2 | Let the user choose where to save the output.| [] |
-| 3 | Keep the interface responsive during processing where practical. | [] |
+| 1 | Add tests for key functionality. | [] |
+| 3 | Check licences and acknowledge external models/datasets. | [] |
