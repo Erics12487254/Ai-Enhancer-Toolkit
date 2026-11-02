@@ -1,9 +1,10 @@
 
+# Standard dependencies
 import cv2
 import sqlite3
 from pathlib import Path
 
-# Image processing operations.
+# Image processing operations
 from enhance import enhance_image
 from loader import load_image
 from resize import resize_image
@@ -11,29 +12,16 @@ from crop import crop_image
 from blur import blur_image
 from sharpen import sharpen_image
 
-# Image storage operations.
-from save import (
-    OUTPUT_DIR,
-    STAGING_DIR,
-    create_staged_image,
-    get_final_path,
-    publish_staged_image,
-    delete_image_file,
-    copy_image
-)
+# Image storage service
+from save import ImageStorage
 
-# Database operations.
-from database.database import (
-    add_image,
-    update_image_status,
-    get_image,
-    get_pending_images,
-    initialize_database,
-    synchronize_images,
-    mark_expired_images,
-    delete_image_record,
-    get_images
-)
+# Database service
+from database.database import ImageDatabase
+
+
+# Initialize independent services
+image_storage = ImageStorage()
+image_database = ImageDatabase()
 
 
 OPERATIONS = {
@@ -54,6 +42,7 @@ def _database_call(function, *args, **kwargs):
 
     try:
         return function(*args, **kwargs)
+
     except sqlite3.Error as error:
         raise ApplicationError(
             f"A database operation failed: {error}"
@@ -111,15 +100,15 @@ def process_image(path, operation, output_path=None):
         )
 
     # Step 1: Write the processed image to temporary storage.
-    staged_path = create_staged_image(result)
+    staged_path = image_storage.create_staged_image(result)
 
     # Step 2: Determine its permanent destination.
-    final_path = get_final_path(staged_path)
+    final_path = image_storage.get_final_path(staged_path)
 
     # Step 3: Register the image as pending.
     try:
         image_id = _database_call(
-            add_image,
+            image_database.add_image,
             output_name=final_path.name,
             output_path=str(final_path.resolve()),
             staging_path=staged_path,
@@ -130,19 +119,23 @@ def process_image(path, operation, output_path=None):
 
     except Exception:
         # If registration fails, remove the unregistered staged file.
-        delete_image_file(staged_path)
+        image_storage.delete_image_file(staged_path)
         raise
 
     # Step 4: Move the staged image into permanent storage.
     # If this fails, the pending record remains for recovery.
     try:
-        publish_staged_image(
+        image_storage.publish_staged_image(
             staged_path,
             final_path
         )
 
         # Step 5: Make the image visible to the gallery.
-        _database_call(update_image_status, image_id, "ready")
+        _database_call(
+            image_database.update_image_status,
+            image_id,
+            "ready"
+        )
 
     except (OSError, ApplicationError) as error:
         raise RuntimeError(
@@ -161,7 +154,9 @@ def recover_pending_images():
     Otherwise, try to publish the staged file.
     """
 
-    pending_images = _database_call(get_pending_images)
+    pending_images = _database_call(
+        image_database.get_pending_images
+    )
 
     for record in pending_images:
 
@@ -177,25 +172,36 @@ def recover_pending_images():
             if final_path.is_file():
 
                 # The move succeeded, but the database update may have failed.
-                _database_call(update_image_status, image_id, "ready")
+                _database_call(
+                    image_database.update_image_status,
+                    image_id,
+                    "ready"
+                )
 
                 if staged_path and staged_path.exists():
-                    delete_image_file(staged_path)
+                    image_storage.delete_image_file(staged_path)
 
             elif staged_path and staged_path.is_file():
 
                 # The application stopped before publishing the image.
-                publish_staged_image(
+                image_storage.publish_staged_image(
                     staged_path,
                     final_path
                 )
 
-                _database_call(update_image_status, image_id, "ready")
+                _database_call(
+                    image_database.update_image_status,
+                    image_id,
+                    "ready"
+                )
 
             else:
 
                 # Neither file exists, so remove the unusable record.
-                _database_call(delete_image_record, image_id)
+                _database_call(
+                    image_database.delete_image_record,
+                    image_id
+                )
 
         except (OSError, ApplicationError) as error:
             print(
@@ -208,12 +214,14 @@ def cleanup_orphan_staging_files():
     Remove staged files that have no pending database record.
     """
 
-    STAGING_DIR.mkdir(
+    image_storage.staging_dir.mkdir(
         parents=True,
         exist_ok=True
     )
 
-    pending_images = _database_call(get_pending_images)
+    pending_images = _database_call(
+        image_database.get_pending_images
+    )
 
     known_staging_paths = {
         Path(record["staging_path"]).resolve()
@@ -221,13 +229,13 @@ def cleanup_orphan_staging_files():
         if record["staging_path"]
     }
 
-    for staged_file in STAGING_DIR.iterdir():
+    for staged_file in image_storage.staging_dir.iterdir():
 
         if staged_file.is_file():
             if staged_file.resolve() not in known_staging_paths:
 
                 try:
-                    delete_image_file(staged_file)
+                    image_storage.delete_image_file(staged_file)
 
                 except OSError as error:
                     print(
@@ -239,16 +247,21 @@ def cleanup_orphan_staging_files():
 def cleanup_expired_images():
     """Delete expired image files and their database records."""
 
-    expired_images = _database_call(mark_expired_images)
+    expired_images = _database_call(
+        image_database.mark_expired_images
+    )
 
     for image_id, output_path in expired_images:
 
         try:
             # Remove the actual image file first.
-            delete_image_file(output_path)
+            image_storage.delete_image_file(output_path)
 
             # Only then remove its database record.
-            _database_call(delete_image_record, image_id)
+            _database_call(
+                image_database.delete_image_record,
+                image_id
+            )
 
         except (OSError, ApplicationError) as error:
             # The deleting record remains for another attempt.
@@ -261,29 +274,42 @@ def cleanup_expired_images():
 def delete_image(image_id):
     """Delete one gallery image and its database record."""
 
-    record = _database_call(get_image, image_id)
+    record = _database_call(
+        image_database.get_image,
+        image_id
+    )
 
     if record is None:
         raise ValueError("Image record was not found.")
 
     # Hide it from the gallery before attempting deletion.
-    _database_call(update_image_status, image_id, "deleting")
+    _database_call(
+        image_database.update_image_status,
+        image_id,
+        "deleting"
+    )
 
     # If file deletion fails, the deleting record remains for retry.
-    delete_image_file(record["output_path"])
+    image_storage.delete_image_file(record["output_path"])
 
-    _database_call(delete_image_record, image_id)
+    _database_call(
+        image_database.delete_image_record,
+        image_id
+    )
 
 
 def download_image(image_id, destination_path):
     """Copy one gallery image to the user's chosen location."""
 
-    record = _database_call(get_image, image_id)
+    record = _database_call(
+        image_database.get_image,
+        image_id
+    )
 
     if record is None or record["status"] != "ready":
         raise ValueError("Image is not available for download.")
 
-    return copy_image(
+    return image_storage.copy_image(
         record["output_path"],
         destination_path
     )
@@ -293,7 +319,11 @@ def run_maintenance():
     """Run storage recovery, synchronization, and expiration cleanup."""
 
     recover_pending_images()
-    _database_call(synchronize_images)
+
+    _database_call(
+        image_database.synchronize_images
+    )
+
     cleanup_expired_images()
     cleanup_orphan_staging_files()
 
@@ -301,11 +331,16 @@ def run_maintenance():
 def initialize_app():
     """Initialize the database and perform startup maintenance."""
 
-    _database_call(initialize_database)
+    _database_call(
+        image_database.initialize_database
+    )
+
     run_maintenance()
 
 
 def get_gallery_images():
     """Return the images currently available to the gallery."""
 
-    return _database_call(get_images)
+    return _database_call(
+        image_database.get_images
+    )
