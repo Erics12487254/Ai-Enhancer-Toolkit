@@ -1,219 +1,131 @@
 # AI Enhancer Toolkit
 
-A Python image-processing application with a drag-and-drop desktop interface and a persistent image gallery. AI enhancement is planned for a future version.
+A Python image-processing application with a drag-and-drop desktop interface and a persistent image gallery. The desktop app supports resize, crop, blur, sharpen, and Real-ESRGAN enhancement.
+
+Real-ESRGAN runs on the CPU in the current setup and may take considerably longer than the traditional image-processing operations. The supplied model weights are expected at `Project Ai Enhancer Toolkit/models/RealESRGAN_x2plus.pth`.
 
 ## Features
 
-- Resize, crop, blur, and sharpen images.
-- Drag and drop an image, choose an operation, and process it through the desktop interface.
-- Validate image files and display processing errors.
-- Store processed images in a persistent gallery.
-- Keep image metadata in an SQLite database.
-- Download or delete images from the gallery.
-- Automatically remove gallery images after 30 days.
-- Recover interrupted image-saving operations.
+- Select an image by dragging it into the app or browsing for it.
+- Resize, crop, blur, sharpen, or enhance an image.
+- Validate selected images and display processing errors.
+- Save results in `Project Ai Enhancer Toolkit/saved_images/`.
+- Browse, download, and delete saved images.
+- Keep saved images after closing and reopening the application.
 
-The **Enhance** option is listed in the interface but is not implemented yet.
+The GUI currently uses the backend defaults for resize and crop. It does not yet provide controls for operation settings or output format. Processed results are saved as JPEG by default.
 
 ## Requirements
 
-- Python 3.10 or newer.
-- Packages listed in `requirements.txt`.
-- Pytest is required only for running automated tests.
+- Python 3.10 or newer
+- Tkinter support in the Python installation
+- Packages listed in `requirements.txt`
+- Real-ESRGAN model weights at the path listed above to use enhancement
 
 ## Installation
 
-### 1. Clone the repository
-
-```powershell
-git clone https://github.com/Erics12487254/Ai-Enhancer-Toolkit.git
-cd Ai-Enhancer-Toolkit
-```
-
-### 2. Create a virtual environment
+From the repository root, run:
 
 ```powershell
 python -m venv .venv
-```
-
-### 3. Activate the virtual environment
-
-For Windows PowerShell:
-
-```powershell
 .\.venv\Scripts\Activate.ps1
-```
-
-If PowerShell blocks script execution, you may need to adjust the execution policy for your current user.
-
-### 4. Install dependencies
-
-```powershell
+python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-## Running the Application
+If PowerShell blocks activation, use the virtual environment's Python directly:
 
-From the repository root, run:
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
+
+## Run the Application
+
+From the repository root:
 
 ```powershell
 python "Project Ai Enhancer Toolkit/gui.py"
 ```
 
-### Using the Application
+1. Drop an image into the input area or click it to browse.
+2. Choose an operation.
+3. Select **Process Image**.
+4. Find the result in the gallery.
+5. Use **Download** to copy a gallery image elsewhere, or **Delete** to remove it.
 
-1. Open the application.
-2. Drag and drop an image into the input area.
-3. Choose an available processing operation.
-4. Select **Process image**.
-5. The processed image is saved in the application's `saved_images/` directory and appears in the gallery.
-6. Use the gallery's **Download** option to copy an image to a chosen destination.
-7. Use **Delete** to remove an image from the gallery.
+The current interface runs processing synchronously. Long operations, especially Real-ESRGAN enhancement, may temporarily make the window unresponsive.
 
-Gallery images and their metadata persist after the application is closed.
+## Run the Tests
 
-Images are automatically removed after 30 days, based on their processing timestamp. The application also performs maintenance to recover interrupted saves and synchronize missing image files.
-
-## Running Automated Tests
-
-The automated tests are located inside `Project Ai Enhancer Toolkit/tests/`.
-
-Install pytest in the active virtual environment:
+Install pytest if it is not already available:
 
 ```powershell
 python -m pip install pytest
 ```
 
-From the repository root, enter the application directory:
+Run the tests from the application directory:
 
 ```powershell
 cd "Project Ai Enhancer Toolkit"
-```
-
-Run the storage and gallery tests:
-
-```powershell
-python -m pytest tests/test_storage.py -v
+python -m pytest tests/ -v
 ```
 
 ## Project Structure
 
-- `Project Ai Enhancer Toolkit/` — application and image-processing modules.
-  - `database/` — SQLite database and database operations.
-  - `saved_images/` — persistent storage for processed images.
-  - `.staging_images/` — temporary staging area used during image saving.
-  - `tests/` — automated tests for application functionality.
-- `resource/` — sample project resources.
-- `test/` — local learning examples arranged by roadmap stage; this folder is currently excluded by `.gitignore`.
-- `exercise/` — separate learning and experimentation files, including super-resolution evaluation.
-- `ROADMAP.md` — learning checklist.
-- `PROGRESS.md` — session progress and next learning plan.
-- `WORKFLOW.md` — application flow and module responsibilities.
-
-## Learning Examples
-
-### Stage 2 — OpenCV
-
-- `test/Stage 2/color.py` prints image dimensions and a BGR pixel. It also compares interpolation methods, which are covered in Stage 3.
-
-### Stage 3 — Image Processing
-
-- `test/Stage 3/limitation.py` shrinks an image, enlarges it again, and compares the result with the original.
-
-### Stage 5 — Deep Learning
-
-- `test/Stage 5/cnn.py` demonstrates a small neural network's forward pass, backpropagation, and one parameter update. Despite its filename, this example does not implement a CNN.
-
-### Stage 6 — PyTorch
-
-- `tensor.py` and `tensor2.py` introduce tensors and normalization.
-- `device.py` selects CPU or CUDA.
-- `dataset.py` defines a tiny image dataset and shows batches.
-- `linear_model.py` demonstrates a `Linear` layer with known weights.
-- `train_classifier.py` trains a small classifier and saves its weights.
-- `save_load_model.py` loads those weights.
-- `training_validation_loss.py` compares loss on separate toy training and validation examples.
-- Run `train_classifier.py` before `save_load_model.py`. The four-image dataset is only for learning the mechanics, not for meaningful model evaluation.
-
-### Stage 7 — Super-Resolution
-
-- `test/Stage 7/low_reso.py` creates low-resolution copies from the high-resolution dataset by resizing each image to half its width and height.
-- `test/Stage 7/espcn.py` defines and trains an ESPCN model for 2× upscaling. It uses paired low- and high-resolution images, reserves `Alexei_Leonov.jpg` for a held-out inference example, and saves the model weights and output image beside the learning script and in `test/SR_results/`, respectively.
-- `test/Stage 7/model_comparison.py` demonstrates the tensor shape flow of SRCNN-style and ESPCN-style upscaling on a small example. It compares their stages and shapes, not their image quality or runtime.
-
-### Stage 9 — Real-ESRGAN
-
-- Explored Real-ESRGAN as a generative super-resolution approach.
-- Installed and configured Real-ESRGAN in a separate Python environment.
-- Ran inference using the pretrained `RealESRGAN_x2plus` model.
-- Evaluated its ability to generate visually convincing image details.
-
-### Stage 10 — Super-Resolution Evaluation
-
-Compared three image upscaling approaches using the same low-resolution input image and original high-resolution reference:
-
-1. **Bicubic interpolation** — traditional image interpolation using OpenCV.
-2. **ESPCN** — a deep learning-based super-resolution model.
-3. **Real-ESRGAN** — a generative super-resolution model.
-
-The evaluation workflow is located in `exercise/Stage 10/`.
-
-#### Evaluation Metrics
-
-- **PSNR (Peak Signal-to-Noise Ratio):** Measures pixel-level similarity between the generated output and reference image. Higher values indicate greater numerical similarity.
-- **SSIM (Structural Similarity Index):** Measures structural similarity between the generated output and reference image. Higher values indicate greater similarity.
-- **Runtime:** Measures the processing time required by each method. Lower values indicate faster processing.
-
-#### Experimental Results
-
-The following results were obtained using `Alexei_Leonov.jpg`, with all outputs standardized to 3844 × 3075 pixels.
-
-| Method | PSNR (dB) | SSIM | Runtime (seconds) |
-|---|---:|---:|---:|
-| Bicubic | 33.9431 | 0.8926 | 0.0116 |
-| ESPCN | 15.5001 | 0.5581 | 0.7384 |
-| Real-ESRGAN | 31.2559 | 0.8255 | 79.8095 |
-
-#### Evaluation Workflow
-
-- `quality_evaluator.py` coordinates the evaluation of all three methods.
-- `realesrgan_test.py` runs Real-ESRGAN using its separate Python environment.
-- `test_result.py` saves the evaluation results into an SQLite database.
-- `evaluation.db` stores the method names, image paths, PSNR, SSIM, runtime, image dimensions, and timestamps.
-- Standardized output images are saved in `exercise/SR_results/standardized/`.
-
-Run the evaluation from the repository root using the main project environment:
-
-```powershell
-python "exercise/Stage 10/quality_evaluator.py"
+```text
+Ai Enhancer Toolkit/
+├── Project Ai Enhancer Toolkit/
+│   ├── blur.py
+│   ├── brightness.py
+│   ├── color.py
+│   ├── config.py
+│   ├── contrast.py
+│   ├── crop.py
+│   ├── enhance.py
+│   ├── gallery.py
+│   ├── gui.py
+│   ├── loader.py
+│   ├── main.py
+│   ├── preview.py
+│   ├── resize.py
+│   ├── save.py
+│   ├── scaler.py
+│   ├── sharpen.py
+│   ├── models/
+│   ├── saved_images/
+│   └── tests/
+├── exercise/
+├── resource/
+├── AI_ASSISTANCE_RULES.md
+├── PROGRESS.md
+├── README.md
+├── ROADMAP.md
+├── WORKFLOW.md
+└── requirements.txt
 ```
 
-Real-ESRGAN runs on the CPU in the current setup and takes significantly longer than the other methods. Keep the device adequately ventilated during evaluation.
+### Application Modules
 
-#### Observations and Limitations
+- `gui.py` — collects user input and displays results and gallery previews.
+- `main.py` — validates requests and orchestrates backend work.
+- `loader.py` — loads images into OpenCV arrays.
+- `resize.py`, `crop.py`, `blur.py`, `sharpen.py`, and `enhance.py` — implement processing operations.
+- `gallery.py` — finds saved images and returns gallery records.
+- `preview.py` — prepares thumbnail data and image dimensions for the frontend.
+- `save.py` — saves, copies, and deletes image files.
+- `tests/` — automated tests for image operations and storage behavior.
 
-- **Bicubic:** Fastest method and achieved the highest PSNR and SSIM in this experiment. However, interpolation cannot reconstruct genuinely missing image details.
-- **ESPCN:** Requires more processing time than Bicubic. Its relatively low evaluation scores may be related to the limited training dataset and model training process.
-- **Real-ESRGAN:** Produced visually detailed results and achieved higher PSNR and SSIM than ESPCN. However, it required significantly more processing time. Its generative approach may introduce plausible details that do not accurately represent the original image.
+## Learning and Evaluation Work
 
-PSNR and SSIM do not fully represent perceived image quality. Furthermore, this experiment uses only one reference image, so the results should not be treated as universal rankings of the three approaches.
+The repository also contains learning examples and experiments for machine learning, PyTorch, super-resolution, and image-quality evaluation. These experiments are separate from the desktop workflow unless explicitly integrated above.
 
-## Current Development Status
+The Stage 10 evaluation uses a single reference image. Its PSNR and SSIM values are useful for learning, but they do not establish a general ranking of the methods. Generative enhancement can produce plausible details that were not present in the source image.
 
-The current development focus is **Stage 11 — Final Application**.
+## Limitations and Model Terms
 
-### Recent Progress
+- The GUI currently provides no controls for resize dimensions, crop coordinates, or save format.
+- Images are loaded using OpenCV's color mode, so alpha transparency is not retained by the current workflow.
+- Real-ESRGAN inference uses the CPU in the current configuration and can be slow.
+- Review the model and dataset terms before redistributing weights or datasets.
 
-- Implemented persistent image storage using a dedicated `saved_images/` directory.
-- Added SQLite-backed gallery metadata storage.
-- Implemented a staging and publishing workflow to reduce the risk of incomplete image saves.
-- Added recovery for interrupted image-saving operations.
-- Implemented gallery image downloading and deletion.
-- Added automatic expiration and cleanup of images after 30 days.
-- Added synchronization between stored image files and database records.
-- Added seven automated storage and gallery tests. All seven passed.
-- Manually verified image persistence after restarting the application, downloading images, and deleting gallery images.
-
-The super-resolution models and Real-ESRGAN inference workflow remain experimental learning components. They are not integrated into the desktop application.
-
-No AI model is currently integrated into or bundled with the application. Model and dataset licensing will be documented if they are added to the project.
+See `ROADMAP.md` for planned work and `PROGRESS.md` for recorded progress.

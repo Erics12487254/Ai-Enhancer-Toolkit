@@ -1,3 +1,6 @@
+numpy
 opencv-python
 tkinterdnd2
 torch
+basicsr
+realesrgan
