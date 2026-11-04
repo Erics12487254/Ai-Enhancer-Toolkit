@@ -1,13 +1,23 @@
 import numpy as np
 
-def crop_image(image):
-    #Check the input type in case this function is called directly.
+
+def crop_image(image, x=100, y=100, width=400, height=400):
+    """Return a rectangular crop from an image."""
+
     if not isinstance(image, np.ndarray):
         raise TypeError("Input must be a NumPy array.")
 
-    if image.shape[0] < 500 or image.shape[1] < 500:
-        raise ValueError("Image is too small to crop. Minimum size is 500x500 pixels.")
-    cropped_image = image[100:500, 100:500]  # Crop the image to a 400x400 region.
+    if not all(isinstance(value, int) for value in (x, y, width, height)):
+        raise ValueError("Crop coordinates and dimensions must be integers.")
 
-    return cropped_image
+    if x < 0 or y < 0 or width <= 0 or height <= 0:
+        raise ValueError(
+            "Crop coordinates must be nonnegative and dimensions positive."
+        )
 
+    image_height, image_width = image.shape[:2]
+
+    if x + width > image_width or y + height > image_height:
+        raise ValueError("The crop area extends beyond the image bounds.")
+
+    return image[y:y + height, x:x + width]

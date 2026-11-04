@@ -1,214 +1,75 @@
-
-from pathlib import Path
-
+import cv2
 import numpy as np
 import pytest
 
-from database import database
-import save
-import main
+from gallery import list_gallery_images
+from save import ImageStorage
 
 
-@pytest.fixture
-def temporary_database(tmp_path, monkeypatch):
-    """Give each test its own temporary database."""
+def test_save_image_creates_file_with_requested_format(tmp_path):
+    storage = ImageStorage(tmp_path)
+    image = np.zeros((8, 8, 3), dtype=np.uint8)
 
-    monkeypatch.setattr(
-        database,
-        "DATABASE_PATH",
-        tmp_path / "gallery.db"
-    )
+    output_path = storage.save_image(image, output_format="png")
 
-    database.initialize_database()
-
-    return tmp_path
+    assert output_path.endswith(".png")
+    assert (tmp_path / output_path.split("/")[-1].split("\\")[-1]).is_file()
 
 
-def test_database_registration(temporary_database):
-    """Check that a registered image can become gallery-ready."""
+def test_rejects_unsupported_output_format(tmp_path):
+    storage = ImageStorage(tmp_path)
+    image = np.zeros((8, 8, 3), dtype=np.uint8)
 
-    image_path = temporary_database / "image.jpg"
-    image_path.write_bytes(b"test image")
-
-    image_id = database.add_image(
-        output_name="image.jpg",
-        output_path=str(image_path),
-        operation="Resize",
-        width=800,
-        height=600
-    )
-
-    database.update_image_status(image_id, "ready")
-
-    images = database.get_images()
-
-    assert len(images) == 1
-    assert images[0]["id"] == image_id
-    assert images[0]["output_name"] == "image.jpg"
+    with pytest.raises(ValueError, match="Unsupported output format"):
+        storage.save_image(image, output_format="gif")
 
 
-def test_synchronize_missing_images(temporary_database):
-    """Check that missing image files lose their database records."""
+def test_gallery_lists_image_dimensions_and_name(tmp_path):
+    storage = ImageStorage(tmp_path)
+    image = np.zeros((12, 20, 3), dtype=np.uint8)
+    saved_path = storage.save_image(image)
 
-    image_path = temporary_database / "missing.jpg"
+    records = list_gallery_images(tmp_path)
 
-    image_id = database.add_image(
-        output_name="missing.jpg",
-        output_path=str(image_path),
-        operation="Resize",
-        width=800,
-        height=600
-    )
-
-    database.update_image_status(image_id, "ready")
-
-    database.synchronize_images()
-
-    assert database.get_image(image_id) is None
+    assert len(records) == 1
+    assert records[0]["path"] == saved_path
+    assert records[0]["filename"].endswith(".jpg")
 
 
-def test_expired_image_detection(temporary_database):
-    """Check that images older than 30 days become deleting."""
+def test_download_copies_image_and_keeps_original(tmp_path):
+    storage = ImageStorage(tmp_path / "gallery")
+    image = np.zeros((8, 8, 3), dtype=np.uint8)
+    saved_path = storage.save_image(image)
+    destination = tmp_path / "download.jpg"
 
-    image_path = temporary_database / "old.jpg"
-    image_path.write_bytes(b"old image")
+    returned_path = storage.copy_image(saved_path, destination)
 
-    image_id = database.add_image(
-        output_name="old.jpg",
-        output_path=str(image_path),
-        operation="Resize",
-        width=800,
-        height=600
-    )
-
-    database.update_image_status(image_id, "ready")
-
-    # Give the record an artificially old timestamp.
-    with database.get_connection() as connection:
-        connection.execute("""
-            UPDATE images
-            SET created_at = '2000-01-01T00:00:00'
-            WHERE id = ?
-        """, (image_id,))
-
-    expired = database.mark_expired_images()
-
-    assert any(item[0] == image_id for item in expired)
-    assert database.get_image(image_id)["status"] == "deleting"
+    assert destination.is_file()
+    assert storage._validate_managed_path(saved_path).is_file()
+    assert returned_path == str(destination.resolve())
 
 
-def test_staging_and_publishing(temporary_database, monkeypatch):
-    """Check that staged images can be published."""
+def test_download_rejects_path_outside_storage(tmp_path):
+    storage = ImageStorage(tmp_path / "gallery")
+    outside_path = tmp_path / "outside.jpg"
 
-    monkeypatch.setattr(
-        save,
-        "OUTPUT_DIR",
-        temporary_database / "saved_images"
-    )
-
-    monkeypatch.setattr(
-        save,
-        "STAGING_DIR",
-        temporary_database / ".staging_images"
-    )
-
-    image = np.zeros((20, 20, 3), dtype=np.uint8)
-
-    staged_path = save.create_staged_image(image)
-    final_path = save.get_final_path(staged_path)
-
-    assert Path(staged_path).is_file()
-
-    save.publish_staged_image(
-        staged_path,
-        final_path
-    )
-
-    assert Path(final_path).is_file()
-    assert not Path(staged_path).exists()
+    with pytest.raises(ValueError, match="outside the storage directory"):
+        storage.copy_image(outside_path, tmp_path / "copy.jpg")
 
 
-def test_recover_pending_image(temporary_database, monkeypatch):
-    """Check that an interrupted save can be recovered."""
+def test_delete_removes_image(tmp_path):
+    storage = ImageStorage(tmp_path)
+    image = np.zeros((8, 8, 3), dtype=np.uint8)
+    saved_path = storage.save_image(image)
 
-    output_dir = temporary_database / "saved_images"
-    staging_dir = temporary_database / ".staging_images"
+    storage.delete_image(saved_path)
 
-    monkeypatch.setattr(save, "OUTPUT_DIR", output_dir)
-    monkeypatch.setattr(save, "STAGING_DIR", staging_dir)
-
-    monkeypatch.setattr(main, "OUTPUT_DIR", output_dir)
-    monkeypatch.setattr(main, "STAGING_DIR", staging_dir)
-
-    image = np.zeros((20, 20, 3), dtype=np.uint8)
-
-    staged_path = save.create_staged_image(image)
-    final_path = save.get_final_path(staged_path)
-
-    image_id = database.add_image(
-        output_name=Path(final_path).name,
-        output_path=str(final_path),
-        staging_path=staged_path,
-        operation="Resize",
-        width=20,
-        height=20
-    )
-
-    # Simulate an interrupted application before publishing.
-    main.recover_pending_images()
-
-    record = database.get_image(image_id)
-
-    assert Path(final_path).is_file()
-    assert record["status"] == "ready"
-    assert record["staging_path"] is None
+    assert not storage._validate_managed_path(saved_path).exists()
 
 
-def test_gallery_image_deletion(temporary_database):
-    """Check that deleting an image removes both file and record."""
+def test_gallery_ignores_unsupported_files(tmp_path):
+    (tmp_path / "notes.txt").write_text("not an image")
 
-    image_path = temporary_database / "image.jpg"
-    image_path.write_bytes(b"test image")
+    records = list_gallery_images(tmp_path)
 
-    image_id = database.add_image(
-        output_name="image.jpg",
-        output_path=str(image_path),
-        operation="Resize",
-        width=800,
-        height=600
-    )
-
-    database.update_image_status(image_id, "ready")
-
-    main.delete_image(image_id)
-
-    assert not image_path.exists()
-    assert database.get_image(image_id) is None
-
-
-def test_image_download(temporary_database):
-    """Check that an image can be copied to a download destination."""
-
-    image_path = temporary_database / "image.jpg"
-    download_path = temporary_database / "downloads" / "image.jpg"
-
-    image_path.write_bytes(b"test image")
-
-    image_id = database.add_image(
-        output_name="image.jpg",
-        output_path=str(image_path),
-        operation="Resize",
-        width=800,
-        height=600
-    )
-
-    database.update_image_status(image_id, "ready")
-
-    result = main.download_image(
-        image_id,
-        download_path
-    )
-
-    assert Path(result).is_file()
-    assert download_path.read_bytes() == image_path.read_bytes()
-    assert image_path.exists()
+    assert records == []
