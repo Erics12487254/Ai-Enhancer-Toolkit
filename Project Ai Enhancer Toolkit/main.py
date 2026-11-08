@@ -1,30 +1,24 @@
 import cv2
 
-from blur import blur_image
-from crop import crop_image
-from enhance import enhance_image
-from gallery import list_gallery_images
-from loader import load_image
-from preview import make_thumbnail_data
-from resize import resize_image
-from save import ImageStorage
-from sharpen import sharpen_image
+from backend.Load_Image.loader import load_image
+
+from backend.Operate_Image.blur import blur_image
+from backend.Operate_Image.crop import crop_image
+from backend.Operate_Image.enhance import enhance_image
+from backend.Operate_Image.sharpen import sharpen_image
+from backend.Operate_Image.resize import resize_image
+
+from backend.Save_Image.save import ImageStorage
+from backend.Save_Image.gallery import list_gallery_images
+from backend.Save_Image.preview import make_thumbnail_data
 
 
 OPERATIONS = {
     "Resize the image": resize_image,
-    "Enhance the image": enhance_image,
+    "Enhance the image ✦": enhance_image,
     "Crop the image": crop_image,
     "Blur the image": blur_image,
     "Sharpen the image": sharpen_image,
-}
-
-OPERATION_SETTINGS = {
-    "Resize the image": {"width", "height"},
-    "Enhance the image": set(),
-    "Crop the image": {"x", "y", "width", "height"},
-    "Blur the image": set(),
-    "Sharpen the image": set(),
 }
 
 
@@ -44,14 +38,14 @@ class Application:
         self.storage = storage
 
     def validate_input(self, path):
-        """Check that the path points to an image the loader can read."""
+        """Check that the path points to a readable image."""
 
         if not isinstance(path, (str, bytes)) or not str(path).strip():
             raise ValueError("Select an image first.")
 
         try:
             load_image(path)
-        except (OSError, cv2.error) as error:
+        except (OSError, ValueError, cv2.error) as error:
             raise ValueError(f"Could not load image: {error}") from error
 
         return path
@@ -77,20 +71,14 @@ class Application:
         if not isinstance(settings, dict):
             raise ValueError("Operation settings must be a dictionary.")
 
-        allowed_settings = OPERATION_SETTINGS[operation]
-        unknown_settings = set(settings) - allowed_settings
-
-        if unknown_settings:
-            names = ", ".join(sorted(unknown_settings))
-            raise ValueError(
-                f"Unsupported settings for {operation}: {names}"
-            )
-
         try:
             image = load_image(path)
             result = operation_function(image, **settings)
-        except (OSError, cv2.error) as error:
-            raise ValueError(f"Could not process the image: {error}") from error
+
+        except (OSError, ValueError, TypeError, cv2.error) as error:
+            raise ValueError(
+                f"Could not process the image: {error}"
+            ) from error
 
         if result is None:
             raise ValueError(f"{operation} is not implemented yet.")

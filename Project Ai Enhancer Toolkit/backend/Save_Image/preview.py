@@ -2,7 +2,7 @@ import base64
 
 import cv2
 
-from loader import load_image
+from backend.Load_Image.loader import load_image
 
 
 def make_thumbnail_data(image_path, max_width=140, max_height=100):

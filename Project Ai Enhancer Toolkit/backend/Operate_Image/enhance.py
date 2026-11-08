@@ -8,7 +8,7 @@ from realesrgan import RealESRGANer
 
 
 # Get the directory containing this Python file.
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Locate the pretrained Real-ESRGAN x2plus weights.
 MODEL_PATH = BASE_DIR / "models" / "RealESRGAN_x2plus.pth"

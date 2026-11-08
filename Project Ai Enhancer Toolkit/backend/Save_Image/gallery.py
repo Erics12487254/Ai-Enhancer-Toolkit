@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from save import ImageStorage
+from backend.Save_Image.save import ImageStorage
 
 
 def list_gallery_images(output_dir=None):
