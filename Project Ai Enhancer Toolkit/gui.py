@@ -1,14 +1,25 @@
 import tkinter as tk
-from datetime import datetime
 from tkinter import filedialog, messagebox
-
 from tkinterdnd2 import DND_FILES, TkinterDnD
 
 from main import OPERATIONS, create_application
 
+from frontend.components.widgets import (
+    create_button,
+    create_scrollable_frame,
+    create_gallery_card,
+)
+
+from frontend.operation_views.resize_view import create_resize_view
+
+
+OPERATION_VIEWS = {
+    "Resize the image": create_resize_view,
+}
+
 
 class ToolkitGUI:
-    """Frontend for the AI Enhancer Toolkit."""
+    """Frontend orchestrator for the AI Enhancer Toolkit."""
 
     def __init__(self, root):
         self.root = root
@@ -26,7 +37,7 @@ class ToolkitGUI:
         self.refresh_gallery()
 
     def _build_interface(self):
-        """Create the application interface."""
+        """Create the four main GUI sections."""
 
         main_frame = tk.Frame(self.root, padx=20, pady=20)
         main_frame.pack(fill="both", expand=True)
@@ -35,17 +46,34 @@ class ToolkitGUI:
             main_frame,
             text="AI Enhancer Toolkit",
             font=("Arial", 22, "bold"),
-        ).pack(pady=(0, 20))
+        ).pack(pady=(0, 15))
+
+        self._build_image_input(main_frame)
+        self._build_operation_selector(main_frame)
+        self._build_operation_workspace(main_frame)
+        self._build_gallery(main_frame)
+
+    def _build_image_input(self, parent):
+        """Section 1: Image input."""
+
+        frame = tk.LabelFrame(
+            parent,
+            text="1. Image Input",
+            padx=10,
+            pady=10,
+        )
+        frame.pack(fill="x", pady=5)
 
         self.drop_area = tk.Label(
-            main_frame,
-            text="Drag and drop an image here\nor click to browse",
+            frame,
+            text="Drag and drop an image here or click to browse",
             relief="groove",
             borderwidth=2,
-            height=5,
-            font=("Arial", 12),
+            height=3,
+            font=("Arial", 11),
         )
-        self.drop_area.pack(fill="x", pady=10)
+        self.drop_area.pack(fill="x")
+
         self.drop_area.drop_target_register(DND_FILES)
         self.drop_area.dnd_bind("<<Drop>>", self.on_drop)
         self.drop_area.bind(
@@ -54,71 +82,119 @@ class ToolkitGUI:
         )
 
         self.status_label = tk.Label(
-            main_frame,
+            frame,
             text="No image selected.",
             anchor="w",
         )
-        self.status_label.pack(fill="x", pady=5)
+        self.status_label.pack(fill="x", pady=(5, 0))
 
-        operation_frame = tk.Frame(main_frame)
-        operation_frame.pack(fill="x", pady=10)
+    def _build_operation_selector(self, parent):
+        """Section 2: Operation selector."""
 
-        tk.Label(operation_frame, text="Operation:").pack(
-            side="left",
-            padx=(0, 10),
+        frame = tk.LabelFrame(
+            parent,
+            text="2. Select Operation",
+            padx=10,
+            pady=10,
+        )
+        frame.pack(fill="x", pady=5)
+
+        self.operation_buttons = {}
+
+        for operation in OPERATIONS:
+            button = create_button(
+                frame,
+                operation,
+                lambda selected=operation: self.select_operation(selected),
+            )
+            button.pack(side="left", padx=5)
+
+            self.operation_buttons[operation] = button
+
+    def _build_operation_workspace(self, parent):
+        """Section 3: Dynamic operation workspace."""
+
+        self.workspace = tk.LabelFrame(
+            parent,
+            text="3. Operation Workspace",
+            padx=10,
+            pady=10,
+        )
+        self.workspace.pack(fill="both", expand=True, pady=5)
+
+        self.workspace_content = tk.Frame(self.workspace)
+        self.workspace_content.pack(fill="both", expand=True)
+
+        self.select_operation(self.operation.get())
+
+    def select_operation(self, operation):
+        """Display the selected operation interface."""
+
+        self.operation.set(operation)
+
+        for widget in self.workspace_content.winfo_children():
+            widget.destroy()
+
+        for name, button in self.operation_buttons.items():
+            button.config(
+                relief="sunken" if name == operation else "raised"
+            )
+
+        view_function = OPERATION_VIEWS.get(operation)
+
+        if view_function:
+            view_function(
+                self.workspace_content,
+                self._apply_operation,
+            )
+
+    def _apply_operation(self, settings):
+        """Send operation requests to the application."""
+
+        if not self.image_path:
+            messagebox.showwarning(
+                "No Image",
+                "Please select an image first.",
+            )
+            return
+
+        try:
+            self.application.process_image(
+                self.image_path,
+                self.operation.get(),
+                settings={
+                    key: int(value)
+                    for key, value in settings.items()
+                },
+            )
+
+        except (ValueError, OSError, RuntimeError) as error:
+            messagebox.showerror(
+                "Operation failed",
+                str(error),
+            )
+            return
+
+        self.refresh_gallery()
+        self.status_label.config(text="Operation completed successfully.")
+
+        messagebox.showinfo(
+            "Success",
+            "Image processed successfully.",
         )
 
-        tk.OptionMenu(
-            operation_frame,
-            self.operation,
-            *OPERATIONS.keys(),
-        ).pack(side="left")
+    def _build_gallery(self, parent):
+        """Section 4: Saved image gallery."""
 
-        self.process_button = tk.Button(
-            operation_frame,
-            text="Process Image",
-            command=self.process_selected_image,
+        frame = tk.LabelFrame(
+            parent,
+            text="4. Saved Gallery",
+            padx=10,
+            pady=10,
         )
-        self.process_button.pack(side="left", padx=15)
+        frame.pack(fill="both", expand=True, pady=5)
 
-        tk.Label(
-            main_frame,
-            text="Saved Images",
-            font=("Arial", 16, "bold"),
-        ).pack(anchor="w", pady=(20, 10))
-
-        self.gallery_canvas = tk.Canvas(
-            main_frame,
-            highlightthickness=0,
-        )
-
-        scrollbar = tk.Scrollbar(
-            main_frame,
-            orient="vertical",
-            command=self.gallery_canvas.yview,
-        )
-
-        self.gallery_frame = tk.Frame(self.gallery_canvas)
-        self.gallery_frame.bind(
-            "<Configure>",
-            lambda event: self.gallery_canvas.configure(
-                scrollregion=self.gallery_canvas.bbox("all")
-            ),
-        )
-
-        self.gallery_canvas.create_window(
-            (0, 0),
-            window=self.gallery_frame,
-            anchor="nw",
-        )
-        self.gallery_canvas.configure(yscrollcommand=scrollbar.set)
-
-        self.gallery_canvas.pack(
-            side="left",
-            fill="both",
-            expand=True,
-        )
-        scrollbar.pack(side="right", fill="y")
+        self.gallery_frame = create_scrollable_frame(frame)
 
     def _browse_image(self):
         """Ask the user to select an image."""
@@ -155,33 +231,6 @@ class ToolkitGUI:
         self.image_path = path
         self.status_label.config(text=f"Selected: {path}")
 
-    def process_selected_image(self):
-        """Send the processing request to the application."""
-
-        if not self.image_path:
-            messagebox.showwarning(
-                "No image selected",
-                "Please select an image first.",
-            )
-            return
-
-        try:
-            output_path = self.application.process_image(
-                self.image_path,
-                self.operation.get(),
-            )
-        except (ValueError, OSError, RuntimeError) as error:
-            self.status_label.config(text=f"Processing failed: {error}")
-            messagebox.showerror("Processing failed", str(error))
-            return
-
-        self.status_label.config(text=f"Successfully saved: {output_path}")
-        self.refresh_gallery()
-        messagebox.showinfo(
-            "Success",
-            "Image processed and saved successfully.",
-        )
-
     def refresh_gallery(self):
         """Display gallery records returned by the application."""
 
@@ -204,78 +253,18 @@ class ToolkitGUI:
             return
 
         for index, record in enumerate(images):
-            self._create_image_card(
+            create_gallery_card(
+                self.gallery_frame,
                 record,
                 index // 3,
                 index % 3,
+                self.thumbnail_images,
+                self._download_image,
+                self._delete_image,
             )
 
-    def _create_image_card(self, record, row, column):
-        """Display one gallery record."""
-
-        card = tk.Frame(
-            self.gallery_frame,
-            relief="groove",
-            borderwidth=1,
-            padx=10,
-            pady=10,
-        )
-        card.grid(
-            row=row,
-            column=column,
-            padx=10,
-            pady=10,
-            sticky="n",
-        )
-
-        thumbnail_data = record.get("thumbnail_data")
-
-        if thumbnail_data:
-            photo = tk.PhotoImage(data=thumbnail_data)
-            self.thumbnail_images.append(photo)
-            tk.Label(card, image=photo).pack(pady=5)
-        else:
-            tk.Label(card, text="Preview unavailable").pack(pady=5)
-
-        tk.Label(
-            card,
-            text=record["filename"],
-            wraplength=160,
-        ).pack(pady=5)
-
-        width = record.get("width")
-        height = record.get("height")
-        resolution = (
-            f"{width} × {height}"
-            if width and height
-            else "Unavailable"
-        )
-
-        tk.Label(card, text=f"Resolution: {resolution}").pack()
-
-        created_at = datetime.fromtimestamp(
-            record["created_at"]
-        ).strftime("%Y-%m-%d %H:%M")
-
-        tk.Label(card, text=f"Date: {created_at}").pack(pady=5)
-
-        button_frame = tk.Frame(card)
-        button_frame.pack(pady=5)
-
-        tk.Button(
-            button_frame,
-            text="Download",
-            command=lambda item=record: self._download_image(item),
-        ).pack(side="left", padx=3)
-
-        tk.Button(
-            button_frame,
-            text="Delete",
-            command=lambda item=record: self._delete_image(item),
-        ).pack(side="left", padx=3)
-
     def _download_image(self, record):
-        """Ask where to copy the selected gallery image."""
+        """Download a gallery image."""
 
         destination = filedialog.asksaveasfilename(
             title="Download image",
@@ -306,7 +295,7 @@ class ToolkitGUI:
         )
 
     def _delete_image(self, record):
-        """Ask for confirmation, then delete the selected gallery image."""
+        """Delete a gallery image after confirmation."""
 
         confirmed = messagebox.askyesno(
             "Delete image",

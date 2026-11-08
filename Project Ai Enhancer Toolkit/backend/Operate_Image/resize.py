@@ -1,5 +1,3 @@
-from turtle import width
-
 import cv2
 
 Default_width, Default_height = 800, 600
