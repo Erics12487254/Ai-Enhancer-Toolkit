@@ -1,45 +1,108 @@
 # AI Enhancer Toolkit
 
-A Python image-processing application with a drag-and-drop desktop interface and a persistent image gallery. The desktop app supports resize, crop, blur, sharpen, and Real-ESRGAN enhancement.
+**A desktop image-processing application powered by OpenCV and Real-ESRGAN.**
 
-Real-ESRGAN runs on the CPU in the current setup and may take considerably longer than the traditional image-processing operations. The supplied model weights are expected at `Project Ai Enhancer Toolkit/models/RealESRGAN_x2plus.pth`.
+AI Enhancer Toolkit is a Python desktop application that allows users to resize images and enhance image resolution using Real-ESRGAN x2plus.
+
+## About the Project
+
+Finding high-resolution images isn't always easy. Sometimes, you find the image you want, but its resolution isn't suitable for your needs.
+
+Online AI image-enhancement services can help, but many restrict their features behind paid subscriptions.
+
+That's where this project idea came from.
+
+I wanted to build a desktop application that lets users resize and enhance their images locally, without depending on paid online image-enhancement services.
+
+The project also serves as a practical learning experience in Python, image processing, deep learning, software architecture, and application testing.
 
 ## Features
 
-- Select an image by dragging it into the app or browsing for it.
-- Resize, crop, blur, sharpen, or enhance an image.
-- Validate selected images and display processing errors.
-- Save results in `Project Ai Enhancer Toolkit/saved_images/`.
-- Browse, download, and delete saved images.
-- Keep saved images after closing and reopening the application.
+### Image Input
+- Browse and select images from your computer.
+- Drag and drop images directly into the application.
+- Validate image input before processing.
 
-The GUI currently uses the backend defaults for resize and crop. It does not yet provide controls for operation settings or output format. Processed results are saved as JPEG by default.
+### Image Processing
 
-## Requirements
+| Operation | Description | Availability |
+|---|---|---|
+| Resize | Change image dimensions to a specified width and height. | Available |
+| AI Enhancement | Enhance images using Real-ESRGAN x2plus with 2× upscaling. | Available |
+| Crop | Select and extract a region of an image. | Future development |
+| Blur | Apply blur filters to images. | Future development |
+| Sharpen | Improve perceived image sharpness. | Future development |
 
-- Python 3.10 or newer
-- Tkinter support in the Python installation
-- Packages listed in `requirements.txt`
-- Real-ESRGAN model weights at the path listed above to use enhancement
+### AI Enhancement
+- Uses the pretrained Real-ESRGAN x2plus model.
+- Prepares the enhancement engine once per application session.
+- Reuses the prepared engine for subsequent enhancement requests.
+- Performs model preparation and image inference in background threads.
+- Keeps the interface responsive during enhancement.
 
-## Installation
+### Saved Images
+- Automatically saves processed images.
+- Displays saved results in a gallery with thumbnails.
+- Allows users to download copies to another location.
+- Allows users to delete saved results.
 
-From the repository root, run:
+## Requirements, Installation & Getting Started
+
+### 1. Prerequisites
+
+| Requirement | Details |
+|---|---|
+| Python | **3.11.9** (recommended; use 64-bit CPython on Windows) |
+| GUI support | Python installation with Tkinter |
+| Dependencies | Packages listed in `requirements.txt` |
+| Model weights | Real-ESRGAN x2plus checkpoint |
+
+**Model location:**
+
+`Project Ai Enhancer Toolkit/backend/models/RealESRGAN_x2plus.pth`
+
+The model weights are included in the repository. Check the applicable model licensing terms before redistributing the weights or a packaged application containing them.
+
+### 2. Set Up the Environment
+
+Open PowerShell at the repository root. Install 64-bit Python 3.11 first. Use the Python launcher (`py`) to create the virtual environment with Python 3.11 explicitly; plain `python -m venv .venv` may select a different installed version, such as Python 3.14.
 
 ```powershell
-python -m venv .venv
+py -3.11 -m venv .venv
 .\.venv\Scripts\Activate.ps1
+python --version
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-If PowerShell blocks activation, use the virtual environment's Python directly:
+Confirm that `python --version` reports Python 3.11.x before installing dependencies. If `py -3.11` is not recognized, install Python 3.11 and reopen PowerShell. You can check which Python versions the launcher can find with `py -0p`.
+
+NumPy, PyTorch, TorchVision, BasicSR, and Real-ESRGAN are pinned to versions that work together in the Python 3.11 environment. NumPy is kept at 1.26.4 because this PyTorch build can fail to bridge to NumPy 2.x, producing errors such as “NumPy is not available.” TorchVision is pinned to 0.16.2 because BasicSR 1.4.2 imports `torchvision.transforms.functional_tensor`, which is absent from newer TorchVision releases. Changing Python or upgrading these packages may require updating and rechecking the pins.
+
+If PowerShell blocks environment activation, use the virtual environment's Python executable directly:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-## Run the Application
+To confirm which interpreter is active, run:
+
+```powershell
+python --version
+```
+
+If you already created `.venv` with the wrong Python version, or installed incompatible packages, close any application using it and recreate the environment from the repository root. This removes the existing virtual environment and its installed packages:
+
+```powershell
+deactivate
+Remove-Item -Recurse -Force .venv
+py -3.11 -m venv .venv
+\.venv\Scripts\Activate.ps1
+python --version
+python -m pip install -r requirements.txt
+```
+
+### 3. Launch the Application
 
 From the repository root:
 
@@ -47,85 +110,173 @@ From the repository root:
 python "Project Ai Enhancer Toolkit/gui.py"
 ```
 
-1. Drop an image into the input area or click it to browse.
-2. Choose an operation.
-3. Select **Process Image**.
-4. Find the result in the gallery.
-5. Use **Download** to copy a gallery image elsewhere, or **Delete** to remove it.
+### 4. Using the Application
 
-The current interface runs processing synchronously. Long operations, especially Real-ESRGAN enhancement, may temporarily make the window unresponsive.
+| Step | Action |
+|---|---|
+| 1 | Browse for an image or drag and drop it into the input area. |
+| 2 | Select **Resize the image** or **Enhance the image**. |
+| 3 | For resizing, enter the target width and height, then select **Apply Resize**. |
+| 4 | For enhancement, wait for engine preparation, then select **Apply Enhancement**. |
+| 5 | Find the processed image in the saved-images gallery. |
+| 6 | Download or delete the result as needed. |
 
-## Run the Tests
+**Note:** Enhancement intentionally has two stages: engine preparation and image processing. The prepared engine is reused throughout the application session.
 
-Install pytest if it is not already available:
+## Architecture
+
+The application follows a layered architecture that separates the graphical interface, application logic, background task execution, and image-processing backend.
+
+### Application Structure
+
+| Layer / Module | Responsibility |
+|---|---|
+| `gui.py` | Main frontend orchestrator. Builds the interface, handles user interactions, and communicates with the application layer. |
+| `frontend/` | Contains reusable interface components and operation-specific views. |
+| `frontend/task_runner.py` | Executes background tasks and returns results or errors through a thread-safe queue. |
+| `main.py` | Application-layer orchestrator. Validates requests and coordinates loading, processing, saving, and gallery operations. |
+| `backend/Load_Image/` | Handles image loading and validation using OpenCV. |
+| `backend/Operate_Image/` | Contains image-processing operations, including resizing and AI enhancement. |
+| `backend/Save_Image/` | Handles image storage, gallery listing, previews, downloads, and deletion. |
+| `backend/models/` | Stores the pretrained Real-ESRGAN model weights. |
+
+### Processing Workflow
+
+```text
+        User
+         |
+         v
+      gui.py
+   (Presentation)
+         |
+         v
+      main.py
+ (Application Logic)
+         |
+         v
+   Image Loading
+         |
+         v
+  Image Processing
+         |
+         v
+   Image Storage
+         |
+         v
+   Gallery Preview
+         |
+         v
+    GUI Display
+```
+
+### Design Principles
+
+| Principle | Implementation |
+|---|---|
+| Separation of concerns | Each module has a focused responsibility. |
+| Backend independence | Backend modules do not depend on Tkinter or GUI components. |
+| Centralized orchestration | `gui.py` handles frontend coordination, while `main.py` coordinates application workflows. |
+| Responsive interface | Long-running enhancement tasks execute in background threads. |
+| Thread safety | Worker threads return results through a queue; Tkinter widget updates happen on the main thread. |
+| Reusable components | Frontend components and the prepared enhancement engine can be reused. |
+
+### Error Handling
+
+- Invalid or unsupported image files are rejected during loading or validation.
+- Processing errors are returned to the application layer.
+- Background task errors are passed back to the GUI through the task queue.
+- Storage operations restrict deletion to files inside the managed saved-images directory.
+
+## Saved Images
+
+Processed images are stored locally inside:
+
+`Project Ai Enhancer Toolkit/backend/Save_Image/saved_images/`
+
+| Function | Behavior |
+|---|---|
+| Save | Stores processed images in the application's saved-images directory. |
+| Gallery | Scans the directory and displays available images, newest first. |
+| Preview | Generates thumbnails and displays image dimensions. |
+| Download | Copies a saved image to a user-selected destination. |
+| Delete | Removes a saved image from the managed directory. |
+
+The gallery uses filesystem information rather than a database. Images are saved as JPEG by default.
+
+## Testing
+
+The project uses **pytest** to verify important application behavior.
+
+After activating `.venv` from the setup instructions, install pytest into that environment:
 
 ```powershell
 python -m pip install pytest
 ```
 
-Run the tests from the application directory:
+Then run the test suite from the repository root:
 
 ```powershell
-cd "Project Ai Enhancer Toolkit"
-python -m pytest tests/ -v
+python -m pytest "Project Ai Enhancer Toolkit/tests" -v
 ```
 
-## Project Structure
+### Test Coverage
 
-```text
-Ai Enhancer Toolkit/
-├── Project Ai Enhancer Toolkit/
-│   ├── blur.py
-│   ├── brightness.py
-│   ├── color.py
-│   ├── config.py
-│   ├── contrast.py
-│   ├── crop.py
-│   ├── enhance.py
-│   ├── gallery.py
-│   ├── gui.py
-│   ├── loader.py
-│   ├── main.py
-│   ├── preview.py
-│   ├── resize.py
-│   ├── save.py
-│   ├── scaler.py
-│   ├── sharpen.py
-│   ├── models/
-│   ├── saved_images/
-│   └── tests/
-├── exercise/
-├── resource/
-├── AI_ASSISTANCE_RULES.md
-├── PROGRESS.md
-├── README.md
-├── ROADMAP.md
-├── WORKFLOW.md
-└── requirements.txt
-```
+| Test Module | What It Tests |
+|---|---|
+| `test_main.py` | Application-layer validation, processing delegation, enhancement preparation, gallery operations, downloads, and deletion. |
+| `test_task_runner.py` | Background execution, arguments, returned results, exception handling, and non-blocking behavior. |
+| `test_application.py` | The application-level image-processing workflow. |
 
-### Application Modules
+**Testing note:** Automated tests do not replace manual testing with the actual desktop interface, real images, and model weights.
 
-- `gui.py` — collects user input and displays results and gallery previews.
-- `main.py` — validates requests and orchestrates backend work.
-- `loader.py` — loads images into OpenCV arrays.
-- `resize.py`, `crop.py`, `blur.py`, `sharpen.py`, and `enhance.py` — implement processing operations.
-- `gallery.py` — finds saved images and returns gallery records.
-- `preview.py` — prepares thumbnail data and image dimensions for the frontend.
-- `save.py` — saves, copies, and deletes image files.
-- `tests/` — automated tests for image operations and storage behavior.
+### Manual AI Enhancement Check
 
-## Learning and Evaluation Work
+Before a release, launch the application and verify the real model workflow:
 
-The repository also contains learning examples and experiments for machine learning, PyTorch, super-resolution, and image-quality evaluation. These experiments are separate from the desktop workflow unless explicitly integrated above.
+1. Start the app using the launch command above.
+2. Browse for a small, ordinary JPG or PNG image.
+3. Select **Enhance the image ✦** and wait until the interface says the enhancement engine is ready.
+4. Select **Apply Enhancement** and wait for the success message. CPU processing can take a while.
+5. Confirm that a new result appears in the gallery, open or download it to confirm it is a readable image, and verify its dimensions are twice the input dimensions.
 
-The Stage 10 evaluation uses a single reference image. Its PSNR and SSIM values are useful for learning, but they do not establish a general ranking of the methods. Generative enhancement can produce plausible details that were not present in the source image.
+This check exercises model loading and real inference; the automated workflow test replaces the enhancement model with a test function and does not verify those steps.
 
-## Limitations and Model Terms
+## Limitations & Future Plans
 
-- The GUI currently provides no controls for resize dimensions, crop coordinates, or save format.
-- Images are loaded using OpenCV's color mode, so alpha transparency is not retained by the current workflow.
-- Real-ESRGAN inference uses the CPU in the current configuration and can be slow.
-- Review the model and dataset terms before redistributing weights or datasets.
+### Current Limitations
 
-See `ROADMAP.md` for planned work and `PROGRESS.md` for recorded progress.
+| Area | Limitation |
+|---|---|
+| Enhancement hardware | The current enhancement engine runs on CPU. |
+| Large images | Enhancement may consume substantial memory, particularly because tiling is disabled. |
+| Image transparency | Images are loaded in OpenCV color mode, so alpha transparency is not retained. |
+| Output format | Processed images are saved as JPEG by default. The GUI does not currently provide format selection. |
+| Processing methods | Only resizing and AI enhancement are selectable in the current GUI. |
+| Enhancement speed | CPU inference can take considerable time, especially with large inputs. |
+
+### Future Development
+
+- [ ] Improve the crop operation and integrate it into the GUI.
+- [ ] Improve the resize interface and processing controls.
+- [ ] Develop a more flexible sharpening operation.
+- [ ] Explore automatic filter selection based on image characteristics.
+- [ ] Experiment with brightness, contrast, and color adjustments.
+- [ ] Explore additional frontend options while preserving backend independence.
+- [ ] Investigate image tiling and hardware acceleration for faster enhancement.
+- [ ] Consider output-format selection and improved image transparency support.
+
+## Acknowledgements
+
+This project uses third-party open-source libraries and pretrained model weights, including:
+
+- OpenCV
+- PyTorch
+- Real-ESRGAN
+- BasicSR
+- TkinterDnD2
+
+Please refer to the relevant upstream projects and their licence notices for attribution and redistribution requirements.
+
+---
+
+**Built as a personal learning project exploring Python, computer vision, deep learning, and software architecture.**

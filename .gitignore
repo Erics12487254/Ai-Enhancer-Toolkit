@@ -5,9 +5,9 @@ __pycache__/
 # Virtual environments
 .venv/
 
-# Generated output
-saved_image.jpg
-outputs/
+# Test and generated application files
+.pytest_cache/
+Project Ai Enhancer Toolkit/backend/Save_Image/saved_images/
 
 # Local editor and operating system files
 .vscode/
@@ -15,5 +15,3 @@ outputs/
 .DS_Store
 Thumbs.db
 Desktop.ini
-exercise/
-resource/

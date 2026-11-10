@@ -458,12 +458,3 @@ Postponed pratical steps. Conceptual learning is finished
 | 1 | Organize the project files and dependencies. | [x] |
 | 2 | Add installation and usage instructions to `README.md`. | [x] |
 | 3 | Include example images and evaluation results. | [x] |
-
-### Plan for the next session
-
-- Continue Stage 11 — Final Application.
-
-### Tomorrow's learning checklist
-
-| 1 | Add tests for key functionality. | [] |
-| 3 | Check licences and acknowledge external models/datasets. | [] |
