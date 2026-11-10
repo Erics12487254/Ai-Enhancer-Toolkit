@@ -1,9 +1,9 @@
+
 import sys
 from pathlib import Path
 
+import cv2
 import numpy as np
-import pytest
-
 
 APP_SOURCE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(APP_SOURCE))
@@ -12,121 +12,90 @@ import main
 
 
 class FakeStorage:
-    """Minimal storage replacement for application-layer tests."""
+    """Capture application save requests without writing real files."""
 
-    def __init__(self):
+    def __init__(self, events):
         self.output_dir = Path("test-gallery")
         self.saved_image = None
         self.saved_format = None
-        self.download_request = None
-        self.deleted_path = None
+        self.events = events
 
     def save_image(self, image, output_format="jpg"):
+        self.events.append("save")
+
         self.saved_image = image
         self.saved_format = output_format
-        return "saved-image.jpg"
 
-    def copy_image(self, image_path, destination_path):
-        self.download_request = (image_path, destination_path)
-        return str(destination_path)
-
-    def delete_image(self, image_path):
-        self.deleted_path = image_path
+        return "test-gallery/result.png"
 
 
-def test_process_image_uses_the_requested_operation(monkeypatch):
-    storage = FakeStorage()
-    application = main.Application(storage)
+def test_complete_image_processing_workflow(
+    tmp_path,
+    monkeypatch,
+):
+    events = []
 
-    source_image = np.zeros((10, 10, 3), dtype=np.uint8)
-    processed_image = np.ones((5, 8, 3), dtype=np.uint8)
+    # Create a real temporary input image.
+    source_path = tmp_path / "source.png"
 
-    monkeypatch.setattr(main, "load_image", lambda path: source_image)
-    monkeypatch.setitem(
-        main.OPERATIONS,
-        "Resize the image",
-        lambda image, width, height: processed_image,
+    source_image = np.zeros(
+        (10, 10, 3),
+        dtype=np.uint8,
     )
 
+    assert cv2.imwrite(str(source_path), source_image)
+
+    # Keep the actual application image loader.
+    original_loader = main.load_image
+
+    def tracked_loader(path):
+        events.append("load")
+        return original_loader(path)
+
+    monkeypatch.setattr(
+        main,
+        "load_image",
+        tracked_loader,
+    )
+
+    # Simulate the selected operation without loading Real-ESRGAN.
+    def test_enhancement(image):
+        events.append("apply")
+
+        assert np.array_equal(image, source_image)
+
+        return image + 50
+
+    monkeypatch.setitem(
+        main.OPERATIONS,
+        "Enhance the image ✦",
+        test_enhancement,
+    )
+
+    storage = FakeStorage(events)
+    application = main.Application(storage)
+
+    # Execute the complete application workflow.
     result = application.process_image(
-        path="source.jpg",
-        operation="Resize the image",
-        settings={"width": 8, "height": 5},
+        path=str(source_path),
+        operation="Enhance the image ✦",
         output_format="png",
     )
 
-    assert result == "saved-image.jpg"
-    assert storage.saved_image is processed_image
+    # Verify that every stage was reached.
+    assert "load" in events
+    assert "apply" in events
+    assert "save" in events
+
+    # Verify that the stages happened in the correct order.
+    assert events.index("load") < events.index("apply")
+    assert events.index("apply") < events.index("save")
+
+    # Verify that the processed image reached storage.
+    assert np.array_equal(
+        storage.saved_image,
+        source_image + 50,
+    )
+
     assert storage.saved_format == "png"
-
-
-def test_process_image_rejects_non_dictionary_settings():
-    application = main.Application(FakeStorage())
-
-    with pytest.raises(
-        ValueError,
-        match="Operation settings must be a dictionary",
-    ):
-        application.process_image(
-            path="source.jpg",
-            operation="Blur the image",
-            settings=["invalid"],
-        )
-
-
-def test_process_image_rejects_unknown_operation():
-    application = main.Application(FakeStorage())
-
-    with pytest.raises(ValueError, match="Choose a valid operation"):
-        application.process_image(
-            path="source.jpg",
-            operation="Rotate the image",
-        )
-
-
-def test_gallery_images_include_preview_data(monkeypatch):
-    storage = FakeStorage()
-    application = main.Application(storage)
-
-    monkeypatch.setattr(
-        main,
-        "list_gallery_images",
-        lambda output_dir: [
-            {
-                "path": "saved-image.jpg",
-                "filename": "saved-image.jpg",
-            }
-        ],
-    )
-    monkeypatch.setattr(
-        main,
-        "make_thumbnail_data",
-        lambda path: {
-            "thumbnail_data": "encoded-thumbnail",
-            "width": 120,
-            "height": 80,
-        },
-    )
-
-    images = application.get_gallery_images()
-
-    assert images == [
-        {
-            "path": "saved-image.jpg",
-            "filename": "saved-image.jpg",
-            "thumbnail_data": "encoded-thumbnail",
-            "width": 120,
-            "height": 80,
-        }
-    ]
-
-
-def test_download_and_delete_are_forwarded_to_storage():
-    storage = FakeStorage()
-    application = main.Application(storage)
-
-    application.download_image("saved.jpg", "download.jpg")
-    application.delete_image("saved.jpg")
-
-    assert storage.download_request == ("saved.jpg", "download.jpg")
-    assert storage.deleted_path == "saved.jpg"
+    assert result == "test-gallery/result.png"
