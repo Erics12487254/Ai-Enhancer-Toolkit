@@ -1,8 +1,12 @@
+
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from tkinterdnd2 import DND_FILES, TkinterDnD
+from queue import Empty
 
 from main import OPERATIONS, create_application
+
+from frontend.task_runner import TaskRunner
 
 from frontend.components.widgets import (
     create_button,
@@ -11,10 +15,12 @@ from frontend.components.widgets import (
 )
 
 from frontend.operation_views.resize_view import create_resize_view
+from frontend.operation_views.enhancer_view import create_enhancer_view
 
 
 OPERATION_VIEWS = {
     "Resize the image": create_resize_view,
+    "Enhance the image ✦": create_enhancer_view,
 }
 
 
@@ -28,13 +34,23 @@ class ToolkitGUI:
         self.root.minsize(750, 550)
 
         self.application = create_application()
+
+        # Manage background tasks independently of the GUI.
+        self.task_runner = TaskRunner()
+
         self.image_path = None
         self.thumbnail_images = []
+
+        self.is_busy = False
+        self.enhancement_state = "idle"
 
         self.operation = tk.StringVar(value=next(iter(OPERATIONS)))
 
         self._build_interface()
         self.refresh_gallery()
+
+        # Check for completed background tasks on the main thread.
+        self.root.after(100, self._check_worker_queue)
 
     def _build_interface(self):
         """Create the four main GUI sections."""
@@ -130,15 +146,44 @@ class ToolkitGUI:
     def select_operation(self, operation):
         """Display the selected operation interface."""
 
-        self.operation.set(operation)
+        if self.is_busy:
+            return
 
-        for widget in self.workspace_content.winfo_children():
-            widget.destroy()
+        self.operation.set(operation)
 
         for name, button in self.operation_buttons.items():
             button.config(
                 relief="sunken" if name == operation else "raised"
             )
+
+        # Prepare the enhancement engine when the user selects enhancement.
+        if operation == "Enhance the image ✦":
+            if self.enhancement_state == "idle":
+                self.enhancement_state = "preparing"
+                self._render_operation_view()
+                self._start_preparation()
+            else:
+                self._render_operation_view()
+
+            return
+
+        self._render_operation_view()
+
+    def _render_operation_view(self):
+        """Render the interface for the currently selected operation."""
+
+        for widget in self.workspace_content.winfo_children():
+            widget.destroy()
+
+        operation = self.operation.get()
+
+        if operation == "Enhance the image ✦":
+            create_enhancer_view(
+                self.workspace_content,
+                self._start_inference,
+                state=self.enhancement_state,
+            )
+            return
 
         view_function = OPERATION_VIEWS.get(operation)
 
@@ -148,8 +193,125 @@ class ToolkitGUI:
                 self._apply_operation,
             )
 
+    def _start_preparation(self):
+        """Initialize the enhancement engine in the background."""
+
+        self.is_busy = True
+        self._set_operation_buttons_state()
+
+        self._run_background_task(
+            "preparation",
+            self.application.prepare_enhancement,
+        )
+
+    def _start_inference(self, settings):
+        """Process the selected image in the background."""
+
+        if self.is_busy:
+            return
+
+        if not self.image_path:
+            messagebox.showwarning(
+                "No Image",
+                "Please select an image first.",
+            )
+            return
+
+        # Keep the selected image path unchanged during processing.
+        image_path = self.image_path
+
+        self.is_busy = True
+        self.enhancement_state = "enhancing"
+
+        self._render_operation_view()
+        self._set_operation_buttons_state()
+
+        self._run_background_task(
+            "inference",
+            self.application.process_image,
+            image_path,
+            "Enhance the image ✦",
+            settings=settings,
+        )
+
+    def _run_background_task(self, task_name, function, *args, **kwargs):
+        """Delegate background execution to TaskRunner."""
+
+        self.task_runner.run(
+            task_name,
+            function,
+            *args,
+            **kwargs,
+        )
+
+    def _check_worker_queue(self):
+        """Handle completed tasks on the Tkinter main thread."""
+
+        try:
+            while True:
+                task_name, result, error = (
+                    self.task_runner.results.get_nowait()
+                )
+
+                self.is_busy = False
+                self._set_operation_buttons_state()
+
+                if error is not None:
+                    if task_name == "preparation":
+                        self.enhancement_state = "idle"
+
+                    elif task_name == "inference":
+                        self.enhancement_state = "ready"
+
+                    self._render_operation_view()
+
+                    messagebox.showerror(
+                        "Operation failed",
+                        str(error),
+                    )
+                    continue
+
+                if task_name == "preparation":
+                    self.enhancement_state = "ready"
+
+                    self._render_operation_view()
+
+                    self.status_label.config(
+                        text="Enhancement engine is ready."
+                    )
+
+                elif task_name == "inference":
+                    self.enhancement_state = "ready"
+
+                    self.refresh_gallery()
+
+                    self.status_label.config(
+                        text="Enhancement completed successfully."
+                    )
+
+                    self._render_operation_view()
+
+                    messagebox.showinfo(
+                        "Success",
+                        "Image enhanced and saved successfully.",
+                    )
+
+        except Empty:
+            pass
+
+        # Continue checking for completed tasks.
+        self.root.after(100, self._check_worker_queue)
+
+    def _set_operation_buttons_state(self):
+        """Prevent operation switching while a task is running."""
+
+        state = tk.DISABLED if self.is_busy else tk.NORMAL
+
+        for button in self.operation_buttons.values():
+            button.config(state=state)
+
     def _apply_operation(self, settings):
-        """Send operation requests to the application."""
+        """Send non-enhancement operation requests to the application."""
 
         if not self.image_path:
             messagebox.showwarning(
@@ -176,7 +338,10 @@ class ToolkitGUI:
             return
 
         self.refresh_gallery()
-        self.status_label.config(text="Operation completed successfully.")
+
+        self.status_label.config(
+            text="Operation completed successfully."
+        )
 
         messagebox.showinfo(
             "Success",
@@ -223,9 +388,12 @@ class ToolkitGUI:
 
         try:
             self.application.validate_input(path)
+
         except (ValueError, OSError, RuntimeError) as error:
             self.image_path = None
-            self.status_label.config(text=f"Invalid image: {error}")
+            self.status_label.config(
+                text=f"Invalid image: {error}"
+            )
             return
 
         self.image_path = path
@@ -241,8 +409,11 @@ class ToolkitGUI:
 
         try:
             images = self.application.get_gallery_images()
+
         except (ValueError, OSError, RuntimeError) as error:
-            self.status_label.config(text=f"Could not load gallery: {error}")
+            self.status_label.config(
+                text=f"Could not load gallery: {error}"
+            )
             return
 
         if not images:
@@ -285,8 +456,12 @@ class ToolkitGUI:
                 record["path"],
                 destination,
             )
+
         except (ValueError, OSError, RuntimeError) as error:
-            messagebox.showerror("Download failed", str(error))
+            messagebox.showerror(
+                "Download failed",
+                str(error),
+            )
             return
 
         messagebox.showinfo(
@@ -307,12 +482,19 @@ class ToolkitGUI:
 
         try:
             self.application.delete_image(record["path"])
+
         except (ValueError, OSError, RuntimeError) as error:
-            messagebox.showerror("Delete failed", str(error))
+            messagebox.showerror(
+                "Delete failed",
+                str(error),
+            )
             return
 
         self.refresh_gallery()
-        self.status_label.config(text=f'Deleted: {record["filename"]}')
+
+        self.status_label.config(
+            text=f'Deleted: {record["filename"]}'
+        )
 
 
 if __name__ == "__main__":

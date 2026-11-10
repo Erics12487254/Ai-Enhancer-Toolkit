@@ -1,12 +1,17 @@
+
 import cv2
 
 from backend.Load_Image.loader import load_image
 
-from backend.Operate_Image.blur import blur_image
-from backend.Operate_Image.crop import crop_image
-from backend.Operate_Image.enhance import enhance_image
-from backend.Operate_Image.sharpen import sharpen_image
-from backend.Operate_Image.resize import resize_image
+from backend.Operate_Image.blur import blur_image  # Future development
+from backend.Operate_Image.crop import crop_image  # Future development
+from backend.Operate_Image.sharpen import sharpen_image  # Future development
+from backend.Operate_Image.resize import resize_image  # Future development
+
+from backend.Operate_Image.enhance import (
+    enhance_image,
+    prepare_enhancement as prepare_enhancement_engine,
+)
 
 from backend.Save_Image.save import ImageStorage
 from backend.Save_Image.gallery import list_gallery_images
@@ -14,11 +19,11 @@ from backend.Save_Image.preview import make_thumbnail_data
 
 
 OPERATIONS = {
-    "Resize the image": resize_image,
+    "Resize the image": resize_image,  # Future development
+    "Crop the image": crop_image,  # Future development
+    "Blur the image": blur_image,  # Future development
+    "Sharpen the image": sharpen_image,  # Future development
     "Enhance the image ✦": enhance_image,
-    "Crop the image": crop_image,
-    "Blur the image": blur_image,
-    "Sharpen the image": sharpen_image,
 }
 
 
@@ -49,6 +54,12 @@ class Application:
             raise ValueError(f"Could not load image: {error}") from error
 
         return path
+
+    def prepare_enhancement(self):
+        """Prepare the Real-ESRGAN engine before image inference."""
+
+        # Delegate engine initialization to the enhancement backend.
+        prepare_enhancement_engine()
 
     def process_image(
         self,
@@ -112,4 +123,4 @@ class Application:
     def delete_image(self, image_path):
         """Delete a gallery image."""
 
-        return self.storage.delete_image(image_path)
+        self.storage.delete_image(image_path)
