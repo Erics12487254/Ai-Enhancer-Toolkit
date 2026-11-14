@@ -6,19 +6,18 @@ AI Enhancer Toolkit is a Python desktop application that allows users to resize 
 
 ## About the Project
 
-Finding high-resolution images isn't always easy. Sometimes, you find the image you want, but its resolution isn't suitable for your needs.
+I have sometimes struggled to find high-resolution images suitable for my desktop and mobile wallpapers. Even when I found the right image, its resolution wasn't always sufficient.
 
-Online AI image-enhancement services can help, but many restrict their features behind paid subscriptions.
+I also explored online AI image-enhancement services, but many restricted their features behind paid subscriptions.
 
-That's where this project idea came from.
+These experiences inspired me to build AI Enhancer Toolkit. I wanted to create a desktop application that would allow me to resize and enhance images locally, without depending on paid online services.
 
-I wanted to build a desktop application that lets users resize and enhance their images locally, without depending on paid online image-enhancement services.
-
-The project also serves as a practical learning experience in Python, image processing, deep learning, software architecture, and application testing.
+Throughout development, I have gained practical experience in Python, image processing, deep learning, software architecture, and application testing. More importantly, this project has allowed me to turn what I have learned into a functional application.
 
 ## Features
 
 ### Image Input
+
 - Browse and select images from your computer.
 - Drag and drop images directly into the application.
 - Validate image input before processing.
@@ -34,13 +33,23 @@ The project also serves as a practical learning experience in Python, image proc
 | Sharpen | Improve perceived image sharpness. | Future development |
 
 ### AI Enhancement
+
 - Uses the pretrained Real-ESRGAN x2plus model.
 - Prepares the enhancement engine once per application session.
 - Reuses the prepared engine for subsequent enhancement requests.
 - Performs model preparation and image inference in background threads.
 - Keeps the interface responsive during enhancement.
 
+### Practical Experiments
+
+While developing AI Enhancer Toolkit, I also explored different image-processing and upscaling techniques through practical experiments. As this work developed, I decided to give it a separate repository so I could document, evaluate, and showcase my experiments independently.
+
+- [Image-Upscaling-Lab](https://github.com/Erics12487254/Image-Upscaling-Lab) – A separate repository that compares Bicubic, ESPCN, and Real-ESRGAN upscaling methods.
+- Evaluates image quality using PSNR and SSIM.
+- Measures processing runtime to compare performance.
+
 ### Saved Images
+
 - Automatically saves processed images.
 - Displays saved results in a gallery with thumbnails.
 - Allows users to download copies to another location.
@@ -77,7 +86,7 @@ python -m pip install -r requirements.txt
 
 Confirm that `python --version` reports Python 3.11.x before installing dependencies. If `py -3.11` is not recognized, install Python 3.11 and reopen PowerShell. You can check which Python versions the launcher can find with `py -0p`.
 
-NumPy, PyTorch, TorchVision, BasicSR, and Real-ESRGAN are pinned to versions that work together in the Python 3.11 environment. NumPy is kept at 1.26.4 because this PyTorch build can fail to bridge to NumPy 2.x, producing errors such as “NumPy is not available.” TorchVision is pinned to 0.16.2 because BasicSR 1.4.2 imports `torchvision.transforms.functional_tensor`, which is absent from newer TorchVision releases. Changing Python or upgrading these packages may require updating and rechecking the pins.
+NumPy, PyTorch, TorchVision, BasicSR, and Real-ESRGAN are pinned to versions that work together in the Python 3.11 environment. NumPy is kept at 1.26.4 because this PyTorch build can fail to bridge to NumPy 2.x, producing errors such as "NumPy is not available." TorchVision is pinned to 0.16.2 because BasicSR 1.4.2 imports `torchvision.transforms.functional_tensor`, which is absent from newer TorchVision releases. Changing Python or upgrading these packages may require updating and rechecking the pins.
 
 If PowerShell blocks environment activation, use the virtual environment's Python executable directly:
 
@@ -97,7 +106,7 @@ If you already created `.venv` with the wrong Python version, or installed incom
 deactivate
 Remove-Item -Recurse -Force .venv
 py -3.11 -m venv .venv
-\.venv\Scripts\Activate.ps1
+.\.venv\Scripts\Activate.ps1
 python --version
 python -m pip install -r requirements.txt
 ```
@@ -146,27 +155,27 @@ The application follows a layered architecture that separates the graphical inte
         User
          |
          v
-      gui.py
-   (Presentation)
+       gui.py
+    (Presentation)
          |
          v
-      main.py
- (Application Logic)
+       main.py
+  (Application Logic)
          |
          v
-   Image Loading
+    Image Loading
          |
          v
-  Image Processing
+   Image Processing
          |
          v
-   Image Storage
+    Image Storage
          |
          v
-   Gallery Preview
+    Gallery Preview
          |
          v
-    GUI Display
+     GUI Display
 ```
 
 ### Design Principles
@@ -205,7 +214,7 @@ The gallery uses filesystem information rather than a database. Images are saved
 
 ## Testing
 
-The project uses **pytest** to verify important application behavior.
+I use **pytest** to verify important application behavior.
 
 After activating `.venv` from the setup instructions, install pytest into that environment:
 
@@ -239,7 +248,7 @@ Before a release, launch the application and verify the real model workflow:
 4. Select **Apply Enhancement** and wait for the success message. CPU processing can take a while.
 5. Confirm that a new result appears in the gallery, open or download it to confirm it is a readable image, and verify its dimensions are twice the input dimensions.
 
-This check exercises model loading and real inference; the automated workflow test replaces the enhancement model with a test function and does not verify those steps.
+This check exercises model loading and real inference. The automated workflow test replaces the enhancement model with a test function and does not verify those steps.
 
 ## Limitations & Future Plans
 
